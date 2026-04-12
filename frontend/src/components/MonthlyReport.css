@@ -1,0 +1,100 @@
+/* =========================================================
+   MonthlyReport.css
+   ========================================================= */
+
+/* ── Summary stat cards ── */
+.rpt-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    animation: slideUp .4s ease;
+  }
+  
+  .rpt-stat {
+    background: rgba(255,255,255,.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius);
+    border: 1px solid rgba(255,255,255,.65);
+    box-shadow: var(--shadow-sm);
+    padding: 1.2rem 1rem;
+    display: flex; flex-direction:column;
+    align-items:center; gap:.32rem; text-align:center;
+    transition: transform .22s ease, box-shadow .22s ease;
+  }
+  .rpt-stat:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+  }
+  .rpt-stat--top {
+    background: linear-gradient(135deg, var(--navy), var(--navy-mid));
+    color: #fff; border-color:transparent;
+  }
+  .rpt-stat--top .rpt-stat-lbl { color:rgba(255,255,255,.65); }
+  .rpt-stat--top .rpt-stat-num { color:#fff; }
+  
+  .rpt-stat-icon { font-size:1.8rem; line-height:1; }
+  .rpt-stat-num  {
+    font-family:'Rajdhani',sans-serif;
+    font-size:1.8rem; font-weight:700; color:var(--navy); line-height:1;
+  }
+  .rpt-stat-lbl  {
+    font-size:.75rem; font-weight:800; color:var(--steel);
+    text-transform:uppercase; letter-spacing:.6px;
+  }
+  
+  /* ── Table card ── */
+  .rpt-tbl-card {
+    padding: 0;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    animation: slideUp .45s ease;
+  }
+  
+  .rpt-rank { font-size:1.1rem; }
+  
+  /* Progress bar */
+  .rpt-bar {
+    position:relative; height:20px;
+    background:var(--pale); border-radius:10px;
+    overflow:hidden; min-width:80px;
+  }
+  .rpt-bar-fill {
+    position:absolute; left:0; top:0; height:100%;
+    background:linear-gradient(90deg, var(--blue-mid), var(--steel));
+    border-radius:10px;
+    transition:width .5s ease;
+  }
+  .rpt-bar-pct {
+    position:absolute; right:.5rem; top:50%;
+    transform:translateY(-50%);
+    font-size:.74rem; font-weight:800; color:var(--navy); z-index:1;
+  }
+  
+  /* ── Chart card ── */
+  .rpt-chart-card {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    animation: slideUp .5s ease;
+  }
+  
+  /* ── Footer ── */
+  .rpt-footer {
+    display:flex; justify-content:flex-end;
+    gap:1rem; flex-wrap:wrap;
+  }
+  
+  /* ── Print ── */
+  @media print {
+    .navbar, .rpt-footer, button { display:none !important; }
+    .page-wrapper { padding:0; max-width:100%; }
+    .card  { box-shadow:none; border:1px solid #ccc; }
+    body   { background:#fff; }
+  }
+  
+  /* ── Responsive ── */
+  @media (max-width:600px) {
+    .rpt-stats  { grid-template-columns:repeat(2,1fr); }
+    .rpt-footer { justify-content:center; }
+  }

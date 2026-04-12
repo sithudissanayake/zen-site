@@ -1,0 +1,158 @@
+/* =========================================================
+   ToDeliver.css
+   ========================================================= */
+
+/* Section heading */
+.tdl-section-hd {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem; font-weight:700; color:var(--navy);
+    margin-bottom: .9rem;
+    display: flex; align-items:center; gap:.6rem;
+    letter-spacing: .3px;
+  }
+  .tdl-count {
+    background: var(--navy); color:#fff;
+    padding: .18rem .65rem; border-radius:20px;
+    font-size: .8rem; font-weight:800;
+  }
+  
+  /* ── Pills grid ── */
+  .tdl-pills {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: .75rem;
+    margin-bottom: 1.8rem;
+  }
+
+  .tdl-open-orders {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0.85rem;
+    margin-bottom: 1.8rem;
+  }
+
+  .tdl-order-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    background: #ffffff;
+    border: 1px solid rgba(99, 102, 241, 0.12);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .tdl-order-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 32px rgba(99, 102, 241, 0.12);
+  }
+
+  .tdl-order-card--active {
+    background: #eef2ff;
+    border-color: #6366f1;
+  }
+
+  .tdl-order-card-main {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .tdl-order-meta {
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-weight: 600;
+  }
+  
+  .tdl-pill {
+    display: flex; align-items:center; gap:.55rem;
+    border-radius: 14px;
+    background: rgba(107,141,227,.25);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all .22s ease;
+  }
+  .tdl-pill:hover {
+    background: rgba(107,141,227,.42);
+    border-color: rgba(107,141,227,.55);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+  .tdl-pill--active {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: #fff;
+    box-shadow: var(--shadow);
+  }
+  .tdl-pill--active:hover {
+    background: var(--navy-mid);
+  }
+  
+  .tdl-pill-id {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem; font-weight:700;
+    letter-spacing: .5px; flex-shrink:0;
+  }
+  .tdl-pill-name {
+    font-size: .82rem; font-weight:700;
+    opacity: .85; white-space:nowrap;
+    overflow:hidden; text-overflow:ellipsis; flex:1;
+  }
+  .tdl-pill-del {
+    margin-left: auto;
+    width:20px; height:20px;
+    border-radius:50%; border:none;
+    background: rgba(198,40,40,.18);
+    color: var(--danger);
+    font-size:1rem; line-height:1;
+    cursor:pointer; transition: all .18s ease;
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .tdl-pill-del:hover {
+    background: var(--danger); color:#fff; transform:scale(1.15);
+  }
+  .tdl-pill--active .tdl-pill-del {
+    background: rgba(255,255,255,.18); color:rgba(255,255,255,.75);
+  }
+  .tdl-pill--active .tdl-pill-del:hover {
+    background: rgba(255,255,255,.35); color:#fff;
+  }
+  
+  /* ── Form card ── */
+  .tdl-form-card {
+    background: rgba(107,141,227,.14);
+    border: 1px solid rgba(107,141,227,.35);
+    max-width: 700px;
+    margin: 0 auto;
+    animation: slideUp .4s ease;
+  }
+  .tdl-form-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.4rem; font-weight:700;
+    color: var(--navy); text-align:center;
+    margin-bottom: 1.8rem; letter-spacing:.5px;
+  }
+  
+  .tdl-note {
+    text-align: center; color:var(--steel);
+    font-size: .9rem; font-weight:700;
+    margin: 1.5rem 0 1.2rem;
+    padding: .6rem 1rem;
+    background: rgba(168,196,232,.3);
+    border-radius: var(--radius-sm);
+  }
+  
+  .tdl-btn-row {
+    display: flex; gap:1rem;
+    justify-content:center; flex-wrap:wrap;
+  }
+  
+  /* ── Responsive ── */
+  @media (max-width:600px) {
+    .tdl-pills { grid-template-columns:repeat(2, 1fr); }
+    .tdl-btn-row { flex-direction:column; align-items:center; }
+    .tdl-btn-row .btn { width:100%; max-width:280px; }
+  }

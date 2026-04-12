@@ -1,0 +1,207 @@
+.purchase-order-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background: white;
+}
+
+.po-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-print {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btn-close-modal {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Company Logo Section */
+.company-logo-section {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.company-logo {
+  max-width: 150px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.company-name {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1e293b;
+}
+
+.company-tagline {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.supplier-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.supplier-section label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.supplier-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.supplier-details {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  padding: 15px;
+  background: #f8fafc;
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.supplier-info p, .po-info p {
+  margin: 8px 0;
+}
+
+.po-info input, .delivery-date input {
+  margin-left: 10px;
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.items-table th, .items-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.items-table th {
+  background: #f5f5f5;
+  font-weight: 600;
+}
+
+.items-table input, .items-table select {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.btn-remove {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-item-row {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.btn-add-item {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.delivery-date {
+  margin-bottom: 20px;
+  padding: 10px;
+  background: #f8fafc;
+  border-radius: 6px;
+}
+
+.total-section {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8fafc;
+  border-radius: 6px;
+  text-align: right;
+}
+
+.total-row {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.total-value {
+  color: #10b981;
+  font-size: 20px;
+}
+
+.signatures {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+}
+
+.signature-line {
+  text-align: center;
+  width: 200px;
+}
+
+.signature-line .line {
+  border-top: 1px solid #000;
+  margin-top: 30px;
+  width: 100%;
+}
+
+.no-supplier-message {
+  text-align: center;
+  padding: 50px;
+  color: #666;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
