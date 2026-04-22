@@ -295,7 +295,7 @@
 }
 
 /* ============================================
-   SEARCH SECTION
+   SEARCH SECTION - FIXED TEXT COLOR
    ============================================ */
 
 .search-section {
@@ -323,13 +323,19 @@
   font-size: 14px;
   transition: all 0.3s ease;
   background: white;
-  color: #1f2937;
+  color: #1f2937 !important;  /* ✅ FIXED: Ensures text is dark/black */
+}
+
+.search-input::placeholder {
+  color: #9ca3af !important;  /* ✅ FIXED: Placeholder text color */
+  opacity: 1;
 }
 
 .search-input:focus {
   outline: none;
   border-color: #4f46e5;
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  color: #1f2937 !important;
 }
 
 .clear-search {
@@ -410,6 +416,7 @@
   border: 1px solid;
   background: white;
   cursor: pointer;
+  color: #1f2937;
 }
 
 /* ============================================
@@ -784,6 +791,12 @@
   font-size: 14px;
   transition: all 0.2s ease;
   box-sizing: border-box;
+  color: #1f2937;
+  background: white;
+}
+
+.modal-input::placeholder {
+  color: #9ca3af;
 }
 
 .modal-input:focus {
@@ -1012,4 +1025,48 @@
     padding: 4px 10px;
     font-size: 10px;
   }
+}
+
+/* ============================================
+   ADDITIONAL FIXES FOR ALL INPUTS
+   ============================================ */
+
+/* Ensures all text inputs have dark text */
+input, 
+textarea, 
+select,
+[type="text"],
+[type="email"],
+[type="number"],
+[type="tel"],
+[type="search"],
+[type="password"] {
+  color: #1f2937 !important;
+  background: white !important;
+}
+
+/* Ensures placeholder text is visible */
+::placeholder,
+::-webkit-input-placeholder,
+::-moz-placeholder,
+:-ms-input-placeholder {
+  color: #9ca3af !important;
+  opacity: 1 !important;
+}
+
+/* Fix for search input specifically */
+input[type="search"] {
+  color: #1f2937 !important;
+  -webkit-text-fill-color: #1f2937 !important;
+}
+
+/* Fix for any inherited white text */
+.admin-order-container * {
+  color: inherit;
+}
+
+.admin-order-container input,
+.admin-order-container textarea,
+.admin-order-container select {
+  color: #1f2937;
 }

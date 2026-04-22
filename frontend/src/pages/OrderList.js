@@ -50,6 +50,7 @@ const OrderList = ({ user }) => {
 
   useEffect(() => {
     fetchOrders();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   // Filter orders based on search term and status

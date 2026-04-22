@@ -72,13 +72,13 @@ public class OrderController {
             String orderNumber = "ORD-" + System.currentTimeMillis();
             order.setOrderNumber(orderNumber);
             
-            String customerName = payload.get("customerName") != null ? payload.get("customerName").toString().trim() : "";
-            String customerEmail = payload.get("customerEmail") != null ? payload.get("customerEmail").toString().trim() : "";
-            Long customerId = payload.get("customerId") != null ? Long.valueOf(payload.get("customerId").toString()) : null;
-            String customerPhone = payload.get("customerPhone") != null ? payload.get("customerPhone").toString().trim() : "";
+            String customerName    = payload.get("customerName")    != null ? payload.get("customerName").toString().trim()    : "";
+            String customerEmail   = payload.get("customerEmail")   != null ? payload.get("customerEmail").toString().trim()   : "";
+            Long   customerId      = payload.get("customerId")      != null ? Long.valueOf(payload.get("customerId").toString()) : null;
+            String customerPhone   = payload.get("customerPhone")   != null ? payload.get("customerPhone").toString().trim()   : "";
             String shippingAddress = payload.get("shippingAddress") != null ? payload.get("shippingAddress").toString().trim() : "";
-            String city = payload.get("city") != null ? payload.get("city").toString().trim() : "";
-            String orderNotes = payload.get("orderNotes") != null ? payload.get("orderNotes").toString().trim() : "";
+            String city            = payload.get("city")            != null ? payload.get("city").toString().trim()            : "";
+            String orderNotes      = payload.get("orderNotes")      != null ? payload.get("orderNotes").toString().trim()      : "";
             
             BigDecimal totalAmount = BigDecimal.ZERO;
             if (payload.get("totalAmount") != null) {
@@ -106,10 +106,10 @@ public class OrderController {
             if (cartItems != null && !cartItems.isEmpty()) {
                 List<OrderItem> orderItems = new ArrayList<>();
                 for (Map<String, Object> item : cartItems) {
-                    String productId = getProductIdAsString(item.get("id"));
+                    String productId   = getProductIdAsString(item.get("id"));
                     String productName = item.get("name").toString();
-                    int quantity = ((Number) item.get("quantity")).intValue();
-                    BigDecimal price = new BigDecimal(item.get("price").toString());
+                    int    quantity    = ((Number) item.get("quantity")).intValue();
+                    BigDecimal price   = new BigDecimal(item.get("price").toString());
                     BigDecimal subtotal = price.multiply(BigDecimal.valueOf(quantity));
                     
                     OrderItem orderItem = new OrderItem();
@@ -130,7 +130,7 @@ public class OrderController {
                 System.out.println("Saved " + orderItems.size() + " order items");
             }
             
-            // Decrease stock after order is saved
+            // Decrease stock after order is saved (batch)
             if (cartItems != null && !cartItems.isEmpty()) {
                 List<ProductStockUpdate> stockUpdates = new ArrayList<>();
                 for (Map<String, Object> item : cartItems) {
@@ -221,7 +221,6 @@ public class OrderController {
             Optional<Order> orderOpt = orderService.getOrderById(id);
             if (orderOpt.isPresent()) {
                 Order order = orderOpt.get();
-                // Fetch items for this order
                 List<OrderItem> items = orderItemRepository.findByOrderId(id);
                 order.setItems(items);
                 return ResponseEntity.ok(order);
@@ -251,33 +250,15 @@ public class OrderController {
             
             Order order = orderOpt.get();
             
-            if (payload.containsKey("customerName")) {
-                order.setCustomerName(payload.get("customerName").toString());
-            }
-            if (payload.containsKey("customerEmail")) {
-                order.setCustomerEmail(payload.get("customerEmail").toString());
-            }
-            if (payload.containsKey("customerId")) {
-                order.setCustomerId(Long.valueOf(payload.get("customerId").toString()));
-            }
-            if (payload.containsKey("customerPhone")) {
-                order.setCustomerPhone(payload.get("customerPhone").toString());
-            }
-            if (payload.containsKey("shippingAddress")) {
-                order.setShippingAddress(payload.get("shippingAddress").toString());
-            }
-            if (payload.containsKey("city")) {
-                order.setCity(payload.get("city").toString());
-            }
-            if (payload.containsKey("orderNotes")) {
-                order.setOrderNotes(payload.get("orderNotes").toString());
-            }
-            if (payload.containsKey("totalAmount")) {
-                order.setTotalAmount(new BigDecimal(payload.get("totalAmount").toString()));
-            }
-            if (payload.containsKey("status")) {
-                order.setStatus(payload.get("status").toString());
-            }
+            if (payload.containsKey("customerName"))    order.setCustomerName(payload.get("customerName").toString());
+            if (payload.containsKey("customerEmail"))   order.setCustomerEmail(payload.get("customerEmail").toString());
+            if (payload.containsKey("customerId"))      order.setCustomerId(Long.valueOf(payload.get("customerId").toString()));
+            if (payload.containsKey("customerPhone"))   order.setCustomerPhone(payload.get("customerPhone").toString());
+            if (payload.containsKey("shippingAddress")) order.setShippingAddress(payload.get("shippingAddress").toString());
+            if (payload.containsKey("city"))            order.setCity(payload.get("city").toString());
+            if (payload.containsKey("orderNotes"))      order.setOrderNotes(payload.get("orderNotes").toString());
+            if (payload.containsKey("totalAmount"))     order.setTotalAmount(new BigDecimal(payload.get("totalAmount").toString()));
+            if (payload.containsKey("status"))          order.setStatus(payload.get("status").toString());
             
             order.setUpdatedAt(LocalDateTime.now());
             Order updatedOrder = orderService.updateOrder(order);
@@ -379,26 +360,22 @@ public class OrderController {
         try {
             List<Order> orders = orderService.getAllOrders();
             
-            long totalOrders = orders.size();
-            double totalRevenue = orders.stream()
-                .map(Order::getTotalAmount)
-                .filter(Objects::nonNull)
-                .mapToDouble(BigDecimal::doubleValue)
-                .sum();
-            long pendingOrders = orders.stream().filter(o -> "PENDING".equals(o.getStatus())).count();
-            long processingOrders = orders.stream().filter(o -> "PROCESSING".equals(o.getStatus())).count();
-            long shippedOrders = orders.stream().filter(o -> "SHIPPED".equals(o.getStatus())).count();
-            long deliveredOrders = orders.stream().filter(o -> "DELIVERED".equals(o.getStatus())).count();
-            long cancelledOrders = orders.stream().filter(o -> "CANCELLED".equals(o.getStatus())).count();
+            long   totalOrders      = orders.size();
+            double totalRevenue     = orders.stream().map(Order::getTotalAmount).filter(Objects::nonNull).mapToDouble(BigDecimal::doubleValue).sum();
+            long   pendingOrders    = orders.stream().filter(o -> "PENDING".equals(o.getStatus())).count();
+            long   processingOrders = orders.stream().filter(o -> "PROCESSING".equals(o.getStatus())).count();
+            long   shippedOrders    = orders.stream().filter(o -> "SHIPPED".equals(o.getStatus())).count();
+            long   deliveredOrders  = orders.stream().filter(o -> "DELIVERED".equals(o.getStatus())).count();
+            long   cancelledOrders  = orders.stream().filter(o -> "CANCELLED".equals(o.getStatus())).count();
             
             Map<String, Object> stats = new LinkedHashMap<>();
-            stats.put("totalOrders", totalOrders);
-            stats.put("totalRevenue", totalRevenue);
-            stats.put("pendingOrders", pendingOrders);
+            stats.put("totalOrders",      totalOrders);
+            stats.put("totalRevenue",     totalRevenue);
+            stats.put("pendingOrders",    pendingOrders);
             stats.put("processingOrders", processingOrders);
-            stats.put("shippedOrders", shippedOrders);
-            stats.put("deliveredOrders", deliveredOrders);
-            stats.put("cancelledOrders", cancelledOrders);
+            stats.put("shippedOrders",    shippedOrders);
+            stats.put("deliveredOrders",  deliveredOrders);
+            stats.put("cancelledOrders",  cancelledOrders);
             
             return ResponseEntity.ok(stats);
         } catch (Exception e) {
