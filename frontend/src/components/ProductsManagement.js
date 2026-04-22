@@ -12,6 +12,11 @@ const ProductsManagement = () => {
   const [topProducts, setTopProducts] = useState([]);
   const productsPerPage = 5;
 
+  // Low Stock Alert States
+  const [showLowStockOnly, setShowLowStockOnly] = useState(false);
+  const [lowStockThreshold] = useState(20);
+  const [showAlert, setShowAlert] = useState(true);
+
   // Stock Report states
   const [reportCategory, setReportCategory] = useState('all');
   const [reportSortBy, setReportSortBy] = useState('stock');
@@ -20,7 +25,6 @@ const ProductsManagement = () => {
   const [reportData, setReportData] = useState(null);
 
   // Image upload states
-  // eslint-disable-next-line no-unused-vars
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
 
@@ -37,18 +41,23 @@ const ProductsManagement = () => {
 
   const API_URL = 'http://localhost:8080';
 
+  // Helper functions for low stock
+  const getLowStockCount = () => {
+    return products.filter(p => (p.stock || 0) > 0 && (p.stock || 0) <= lowStockThreshold).length;
+  };
+
+  const getOutOfStockCount = () => {
+    return products.filter(p => (p.stock || 0) === 0).length;
+  };
+
   // Fetch products from backend
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
       let url = `${API_URL}/api/products/all`;
       
-      console.log('Fetching products from:', url);
-      
       const response = await fetch(url);
       const data = await response.json();
-      
-      console.log('Products response:', data);
       
       if (data && data.success === true) {
         let productsArray = data.data || [];
@@ -57,6 +66,13 @@ const ProductsManagement = () => {
         if (searchTerm) {
           productsArray = productsArray.filter(p => 
             p.name.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+        }
+        
+        // Apply low stock filter if enabled
+        if (showLowStockOnly) {
+          productsArray = productsArray.filter(p => 
+            (p.stock || 0) > 0 && (p.stock || 0) <= lowStockThreshold
           );
         }
         
@@ -72,21 +88,18 @@ const ProductsManagement = () => {
         const sortedByStock = [...productsArray].sort((a, b) => (b.stock || 0) - (a.stock || 0));
         setTopProducts(sortedByStock.slice(0, 5));
       } else {
-        console.error('Failed to fetch products');
         setProducts([]);
       }
     } catch (error) {
       console.error('Error fetching products:', error);
-      alert('Error connecting to backend. Make sure backend is running on port 8080');
       setProducts([]);
     } finally {
       setLoading(false);
     }
-  }, [currentPage, searchTerm]);
+  }, [currentPage, searchTerm, showLowStockOnly]);
 
   // Fetch report data
   const fetchReportData = async () => {
-    console.log('=== FETCHING REPORT DATA ===');
     setGeneratingReport(true);
     
     try {
@@ -96,19 +109,16 @@ const ProductsManagement = () => {
       if (data && data.success === true) {
         let reportProducts = data.data || [];
         
-        // Filter by category
         if (reportCategory !== 'all') {
           reportProducts = reportProducts.filter(p => p.category === reportCategory);
         }
         
-        // Sort products
         if (reportSortBy === 'stock') {
           reportProducts = [...reportProducts].sort((a, b) => (b.stock || 0) - (a.stock || 0));
         } else {
           reportProducts = [...reportProducts].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
         }
         
-        // Calculate category stock totals
         const categoryStockMap = {};
         reportProducts.forEach(product => {
           const cat = product.category || 'Uncategorized';
@@ -135,7 +145,6 @@ const ProductsManagement = () => {
       }
     } catch (error) {
       console.error('Error fetching report data:', error);
-      alert('Error loading report data');
     } finally {
       setGeneratingReport(false);
     }
@@ -146,7 +155,6 @@ const ProductsManagement = () => {
     setReportData(null);
   };
 
-  // Generate and Download PDF using browser print
   const downloadPDFReport = () => {
     if (!reportData) {
       alert('Please view the report first before downloading PDF.');
@@ -154,11 +162,7 @@ const ProductsManagement = () => {
     }
     
     const printWindow = window.open('', '_blank');
-    
-    // Logo URL - replace with your actual logo path
-    const logoUrl = '/zen.jpg'; // Place your logo in public folder or use URL
-    
-    // Find max stock for scaling
+    const logoUrl = '/zen.jpg';
     const maxStockValue = Math.max(...Object.values(reportData.categoryStockMap), 1);
     const categories = Object.entries(reportData.categoryStockMap);
     
@@ -166,445 +170,41 @@ const ProductsManagement = () => {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Stock Count Report - Zenvora</title>
-        <meta charset="UTF-8">
+        <title>Stock Count Report</title>
         <style>
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-          }
-          
-          body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            padding: 30px;
-            background: white;
-            color: #1e293b;
-          }
-          
-          .report-container {
-            max-width: 1200px;
-            margin: 0 auto;
-          }
-          
-          /* Header with Logo */
-          .header {
-            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-            color: white;
-            padding: 25px 35px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          }
-          
-          .header-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-          }
-          
-          .logo {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            object-fit: cover;
-          }
-          
-          .company-info h1 {
-            font-size: 28px;
-            margin-bottom: 5px;
-            font-weight: bold;
-          }
-          
-          .company-info p {
-            font-size: 12px;
-            opacity: 0.8;
-          }
-          
-          .report-info {
-            text-align: right;
-          }
-          
-          .report-info h2 {
-            font-size: 20px;
-            margin-bottom: 5px;
-          }
-          
-          .report-info p {
-            font-size: 11px;
-            opacity: 0.8;
-          }
-          
-          /* Summary Cards */
-          .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
-          }
-          
-          .card {
-            background: #f8fafc;
-            padding: 18px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid #e2e8f0;
-          }
-          
-          .card-value {
-            font-size: 26px;
-            font-weight: bold;
-            color: #4f46e5;
-            margin-bottom: 5px;
-          }
-          
-          .card-title {
-            font-size: 12px;
-            color: #64748b;
-          }
-          
-          /* Graph Section */
-          .graph-section {
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-          }
-          
-          .graph-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 25px;
-            color: #1e293b;
-            text-align: center;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #4f46e5;
-          }
-          
-          .graph-wrapper {
-            display: flex;
-            justify-content: center;
-            padding: 20px 0;
-          }
-          
-          .y-axis-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            margin-right: 15px;
-            text-align: right;
-            height: 250px;
-          }
-          
-          .y-axis-label {
-            font-size: 11px;
-            color: #64748b;
-            position: relative;
-            line-height: 1;
-          }
-          
-          .bars-container {
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            gap: 30px;
-            min-height: 250px;
-          }
-          
-          .bar-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100px;
-          }
-          
-          .bar-category {
-            font-size: 13px;
-            font-weight: 600;
-            color: #334155;
-            margin-bottom: 10px;
-            text-align: center;
-          }
-          
-          .bar-outer {
-            height: 220px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            align-items: center;
-            position: relative;
-            width: 100%;
-          }
-          
-          .bar {
-            width: 65px;
-            background: linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%);
-            border-radius: 8px 8px 0 0;
-            transition: height 0.3s ease;
-            position: relative;
-          }
-          
-          .bar-value {
-            position: absolute;
-            top: -22px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 11px;
-            font-weight: bold;
-            color: #4f46e5;
-            white-space: nowrap;
-          }
-          
-          .x-axis-label {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 13px;
-            color: #64748b;
-            font-weight: 500;
-          }
-          
-          .graph-legend {
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-            margin-top: 25px;
-            padding-top: 15px;
-            border-top: 1px solid #e2e8f0;
-            flex-wrap: wrap;
-          }
-          
-          .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            color: #475569;
-          }
-          
-          .legend-color {
-            width: 14px;
-            height: 14px;
-            border-radius: 4px;
-            background: linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%);
-          }
-          
-          /* Table */
-          .table-wrapper {
-            overflow-x: auto;
-            margin-bottom: 25px;
-          }
-          
-          .table-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #1e293b;
-          }
-          
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-          }
-          
-          th {
-            background: #4f46e5;
-            color: white;
-            padding: 12px 10px;
-            text-align: left;
-            font-size: 12px;
-            font-weight: 600;
-          }
-          
-          td {
-            padding: 10px;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 11px;
-          }
-          
-          tr:last-child td {
-            border-bottom: none;
-          }
-          
-          .stock-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 11px;
-            color: white;
-          }
-          
-          .footer {
-            text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
-            color: #94a3b8;
-            font-size: 10px;
-          }
-          
-          @media print {
-            body {
-              padding: 15px;
-            }
-            .header {
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-            }
-            .bar {
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-            }
-            th {
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-            }
-          }
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: Arial, sans-serif; padding: 30px; }
+          .header { background: #1e3c72; color: white; padding: 20px; text-align: center; margin-bottom: 20px; }
+          .summary { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 20px; }
+          .card { background: #f0f0f0; padding: 15px; text-align: center; border-radius: 8px; }
+          .card-value { font-size: 24px; font-weight: bold; color: #4f46e5; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+          th { background: #4f46e5; color: white; }
+          .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
         </style>
       </head>
       <body>
-        <div class="report-container">
-          <!-- Header with Logo -->
-          <div class="header">
-            <div class="header-left">
-              <img src="${logoUrl}" alt="Zenvora Logo" class="logo" onerror="this.style.display='none'">
-              <div class="company-info">
-                <h1>ZENVORA</h1>
-                <p>Inventory Management System</p>
-              </div>
-            </div>
-            <div class="report-info">
-              <h2>Stock Count Report</h2>
-              <p>Generated: ${new Date(reportData.generatedAt).toLocaleString()}</p>
-              <p>Category: ${reportData.category === 'all' ? 'All Categories' : reportData.category}</p>
-              <p>Sorted by: ${reportData.sortBy === 'stock' ? 'Stock Level (Highest First)' : 'Product Name (A-Z)'}</p>
-            </div>
-          </div>
-          
-          <!-- Summary Cards -->
-          <div class="summary-grid">
-            <div class="card">
-              <div class="card-value">${reportData.totalProducts}</div>
-              <div class="card-title">Total Products</div>
-            </div>
-            <div class="card">
-              <div class="card-value">${reportData.totalStock}</div>
-              <div class="card-title">Total Stock</div>
-            </div>
-            <div class="card">
-              <div class="card-value">Rs. ${reportData.totalValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-              <div class="card-title">Total Value</div>
-            </div>
-            <div class="card">
-              <div class="card-value" style="color: #f59e0b">${reportData.lowStockCount}</div>
-              <div class="card-title">Low Stock (&lt;20)</div>
-            </div>
-            <div class="card">
-              <div class="card-value" style="color: #ef4444">${reportData.outOfStockCount}</div>
-              <div class="card-title">Out of Stock</div>
-            </div>
-          </div>
-          
-          <!-- Bar Graph -->
-          <div class="graph-section">
-            <div class="graph-title">📊 Stock Distribution by Category</div>
-            <div class="graph-wrapper">
-              <div class="y-axis-container">
-                <div class="y-axis-label">${maxStockValue}</div>
-                <div class="y-axis-label">${Math.round(maxStockValue * 0.75)}</div>
-                <div class="y-axis-label">${Math.round(maxStockValue * 0.5)}</div>
-                <div class="y-axis-label">${Math.round(maxStockValue * 0.25)}</div>
-                <div class="y-axis-label">0</div>
-              </div>
-              <div class="bars-container">
-                ${categories.map(([category, stock]) => {
-                  const barHeight = Math.max((stock / maxStockValue) * 200, 30);
-                  return `
-                    <div class="bar-item">
-                      <div class="bar-category">${category}</div>
-                      <div class="bar-outer">
-                        <div class="bar" style="height: ${barHeight}px;">
-                          <div class="bar-value">${stock}</div>
-                        </div>
-                      </div>
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-            </div>
-            <div class="x-axis-label">Product Categories</div>
-            <div class="graph-legend">
-              ${categories.map(([category]) => `
-                <div class="legend-item">
-                  <div class="legend-color"></div>
-                  <span>${category}</span>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-          
-          <!-- Products Table -->
-          <div class="table-wrapper">
-            <div class="table-title">📋 Product Details by Category</div>
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Product ID</th>
-                  <th>Product Name</th>
-                  <th>Category</th>
-                  <th>Brand</th>
-                  <th>Stock</th>
-                  <th>Price (Rs.)</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${reportData.products.map((product, index) => {
-                  let stockColor = '#3b82f6';
-                  if (product.stock === 0) stockColor = '#ef4444';
-                  else if (product.stock < 20) stockColor = '#f59e0b';
-                  else if (product.stock > 100) stockColor = '#10b981';
-                  
-                  return `
-                    <tr>
-                      <td>${index + 1}</td>
-                      <td>${product.id || '-'}</td>
-                      <td>${product.name}</td>
-                      <td>${product.category || '-'}</td>
-                      <td>${product.brand || '-'}</td>
-                      <td><span class="stock-badge" style="background: ${stockColor};">${product.stock || 0}</span></td>
-                      <td>Rs. ${(product.price || 0).toFixed(2)}</td>
-                    </tr>
-                  `;
-                }).join('')}
-              </tbody>
-            </table>
-          </div>
-          
-          <!-- Footer -->
-          <div class="footer">
-            <p>Report generated by Zenvora Inventory System</p>
-            <p style="margin-top: 5px;">${new Date().toLocaleString()}</p>
-          </div>
+        <div class="header">
+          <h1>ZENVORA</h1>
+          <p>Stock Count Report</p>
+          <p>${new Date().toLocaleString()}</p>
         </div>
-        
-        <script>
-          window.onload = function() {
-            setTimeout(function() {
-              window.print();
-              setTimeout(function() {
-                window.close();
-              }, 500);
-            }, 500);
-          };
-        </script>
+        <div class="summary">
+          <div class="card"><div class="card-value">${reportData.totalProducts}</div><div>Total Products</div></div>
+          <div class="card"><div class="card-value">${reportData.totalStock}</div><div>Total Stock</div></div>
+          <div class="card"><div class="card-value">Rs. ${reportData.totalValue.toFixed(2)}</div><div>Total Value</div></div>
+          <div class="card"><div class="card-value">${reportData.lowStockCount}</div><div>Low Stock</div></div>
+          <div class="card"><div class="card-value">${reportData.outOfStockCount}</div><div>Out of Stock</div></div>
+        </div>
+        <table>
+          <thead><tr><th>#</th><th>Product Name</th><th>Category</th><th>Stock</th><th>Price</th></tr></thead>
+          <tbody>
+            ${reportData.products.map((p, i) => `<tr><td>${i+1}</td><td>${p.name}</td><td>${p.category || '-'}</td><td>${p.stock}</td><td>Rs. ${p.price}</td></tr>`).join('')}
+          </tbody>
+        </table>
+        <div class="footer">Generated by Zenvora Inventory System</div>
+        <script>window.onload = function() { window.print(); setTimeout(function() { window.close(); }, 500); };</script>
       </body>
       </html>
     `;
@@ -752,23 +352,19 @@ const ProductsManagement = () => {
     }));
   };
 
-  // ✅ FIXED: Handle form submission with auto-generated ID
   const handleSubmitForm = async (e) => {
     e.preventDefault();
 
     try {
       let response;
       if (isAdding) {
-        // ✅ Remove id field for new products (let backend generate it)
         const { id, ...productData } = formData;
-        
         response = await fetch(`${API_URL}/api/products`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(productData)
         });
       } else {
-        // ✅ For editing, include the id
         response = await fetch(`${API_URL}/api/products/${selectedProduct.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -789,11 +385,11 @@ const ProductsManagement = () => {
         }
         fetchProducts();
       } else {
-        alert('Error saving product: ' + (data.message || 'Unknown error'));
+        alert('Error saving product');
       }
     } catch (error) {
       console.error('Error saving product:', error);
-      alert('Error saving product: ' + error.message);
+      alert('Error saving product');
     }
   };
 
@@ -830,111 +426,50 @@ const ProductsManagement = () => {
     fetchProducts();
   }, [fetchProducts]);
 
+  const lowStockCount = getLowStockCount();
+  const outOfStockCount = getOutOfStockCount();
+
   return (
     <div className="main-container">
-      {/* Report Modal Overlay */}
+      {/* Report Modal */}
       {showReport && reportData && (
         <div className="report-modal-overlay">
           <div className="report-modal-content">
             <div className="report-modal-header">
-              <h2>📊 Stock Count Report</h2>
+              <h2>Stock Count Report</h2>
               <button className="close-report-btn" onClick={closeReport}>×</button>
             </div>
-            
             <div className="report-content">
               <div className="report-header">
                 <h3>STOCK COUNT REPORT</h3>
                 <p>Generated: {new Date(reportData.generatedAt).toLocaleString()}</p>
-                <p>Category: {reportData.category === 'all' ? 'All Categories' : reportData.category}</p>
-                <p>Sorted by: {reportData.sortBy === 'stock' ? 'Stock Level (Highest First)' : 'Product Name (A-Z)'}</p>
               </div>
-
               <div className="report-summary-cards">
-                <div className="report-card">
-                  <div className="report-card-title">Total Products</div>
-                  <div className="report-card-value">{reportData.totalProducts}</div>
-                </div>
-                <div className="report-card">
-                  <div className="report-card-title">Total Stock</div>
-                  <div className="report-card-value">{reportData.totalStock}</div>
-                </div>
-                <div className="report-card">
-                  <div className="report-card-title">Total Value</div>
-                  <div className="report-card-value">Rs. {reportData.totalValue.toFixed(2)}</div>
-                </div>
-                <div className="report-card">
-                  <div className="report-card-title">Low Stock</div>
-                  <div className="report-card-value" style={{ color: '#f59e0b' }}>{reportData.lowStockCount}</div>
-                </div>
-                <div className="report-card">
-                  <div className="report-card-title">Out of Stock</div>
-                  <div className="report-card-value" style={{ color: '#ef4444' }}>{reportData.outOfStockCount}</div>
-                </div>
+                <div className="report-card"><div className="report-card-title">Total Products</div><div className="report-card-value">{reportData.totalProducts}</div></div>
+                <div className="report-card"><div className="report-card-title">Total Stock</div><div className="report-card-value">{reportData.totalStock}</div></div>
+                <div className="report-card"><div className="report-card-title">Total Value</div><div className="report-card-value">Rs. {reportData.totalValue.toFixed(2)}</div></div>
+                <div className="report-card"><div className="report-card-value" style={{ color: '#f59e0b' }}>{reportData.lowStockCount}</div><div className="report-card-title">Low Stock</div></div>
+                <div className="report-card"><div className="report-card-value" style={{ color: '#ef4444' }}>{reportData.outOfStockCount}</div><div className="report-card-title">Out of Stock</div></div>
               </div>
-
-              <div className="report-chart-section">
-                <h4>Stock Distribution by Category</h4>
-                <div className="category-bars">
-                  {Object.entries(reportData.categoryStockMap).map(([category, stock]) => {
-                    const percentage = (stock / reportData.maxStock) * 100;
-                    return (
-                      <div key={category} className="category-bar-item">
-                        <div className="category-bar-label">{category}</div>
-                        <div className="category-bar-container">
-                          <div 
-                            className="category-bar-fill" 
-                            style={{ 
-                              width: `${percentage}%`,
-                              backgroundColor: '#4f46e5'
-                            }}
-                          >
-                            <span className="category-bar-value">{stock}</span>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
               <div className="report-table-wrapper">
                 <table className="report-table">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Product Name</th>
-                      <th>Category</th>
-                      <th>Brand</th>
-                      <th>Stock</th>
-                      <th>Price (Rs.)</th>
-                    </tr>
-                  </thead>
+                  <thead><tr><th>#</th><th>Product Name</th><th>Category</th><th>Stock</th><th>Price</th></tr></thead>
                   <tbody>
                     {reportData.products.map((product, index) => (
                       <tr key={product.id}>
                         <td>{index + 1}</td>
                         <td>{product.name}</td>
                         <td>{product.category || '-'}</td>
-                        <td>{product.brand || '-'}</td>
-                        <td>
-                          <span className="stock-badge" style={{ backgroundColor: getStatusColor(product.stock || 0) }}>
-                            {product.stock || 0}
-                          </span>
-                        </td>
+                        <td><span className="stock-badge" style={{ backgroundColor: getStatusColor(product.stock) }}>{product.stock}</span></td>
                         <td>Rs. {(product.price || 0).toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-
-              <div className="report-footer">
-                <p>Report generated by Zenvora Inventory System</p>
-              </div>
             </div>
-
             <div className="report-modal-footer">
-              <button className="download-pdf-btn" onClick={downloadPDFReport}>📄 Download as PDF</button>
+              <button className="download-pdf-btn" onClick={downloadPDFReport}>Download PDF</button>
               <button className="close-report-btn-bottom" onClick={closeReport}>Close</button>
             </div>
           </div>
@@ -943,7 +478,49 @@ const ProductsManagement = () => {
 
       <div>
         <div className="top-selling-panel">
-          <h3>📊 Stock Count Report</h3>
+          <h3>Stock Count Report</h3>
+          
+          {/* SIMPLE ALERT BOX - ONE CLEAN BOX AT THE TOP */}
+          {(lowStockCount > 0 || outOfStockCount > 0) && showAlert && (
+            <div style={{
+              background: '#fef3c7',
+              borderLeft: '4px solid #f59e0b',
+              borderRadius: '8px',
+              padding: '12px 16px',
+              marginBottom: '15px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                <span style={{ fontSize: '20px' }}>⚠️</span>
+                <span style={{ fontWeight: '500', color: '#92400e' }}>
+                  {outOfStockCount > 0 && `${outOfStockCount} out of stock, `}
+                  {lowStockCount > 0 && `${lowStockCount} products low on stock`}
+                </span>
+                <button 
+                  onClick={() => setShowLowStockOnly(!showLowStockOnly)}
+                  style={{
+                    background: '#f59e0b',
+                    color: 'white',
+                    border: 'none',
+                    padding: '4px 12px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  {showLowStockOnly ? 'Show All' : 'View Low Stock'}
+                </button>
+              </div>
+              <button 
+                onClick={() => setShowAlert(false)}
+                style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#92400e' }}
+              >
+                ×
+              </button>
+            </div>
+          )}
           
           <div className="date-range">
             <div className="date-input">
@@ -968,14 +545,14 @@ const ProductsManagement = () => {
           
           <div className="report-buttons">
             <button className="view-report-btn" onClick={fetchReportData} disabled={generatingReport}>
-              {generatingReport ? 'Loading...' : '👁️ View Report'}
+              {generatingReport ? 'Loading...' : 'View Report'}
             </button>
             <button className="download-report-btn" onClick={downloadPDFReport} disabled={generatingReport}>
-              📄 Download PDF
+              Download PDF
             </button>
           </div>
           
-          <h4>🏆 Top Stocked Products</h4>
+          <h4>Top Stocked Products</h4>
           {loading ? (
             <div className="loading">Loading...</div>
           ) : topProducts.length > 0 ? (
@@ -1004,18 +581,32 @@ const ProductsManagement = () => {
               <div className="loading">Loading products...</div>
             ) : products.length > 0 ? (
               products.map(product => (
-                <div key={product.id} className={`product-item ${selectedProduct?.id === product.id ? 'active' : ''}`} onClick={() => handleSelectProduct(product)}>
+                <div 
+                  key={product.id} 
+                  className={`product-item ${selectedProduct?.id === product.id ? 'active' : ''}`} 
+                  onClick={() => handleSelectProduct(product)}
+                  style={{
+                    borderLeft: (product.stock <= 20 && product.stock > 0) ? '3px solid #f59e0b' : 
+                               (product.stock === 0) ? '3px solid #ef4444' : 'none'
+                  }}
+                >
                   <img src={product.photo || 'https://via.placeholder.com/150'} alt={product.name} className="product-thumb" />
                   <div className="product-info">
                     <div className="product-id">{product.id}</div>
                     <div className="product-name">{product.name}</div>
                     <div className="product-price">RS. {product.price?.toFixed(2)}</div>
-                    <div className="product-stock">Stock: {product.stock}</div>
+                    <div className="product-stock" style={{ color: getStatusColor(product.stock) }}>
+                      Stock: {product.stock}
+                      {product.stock <= 20 && product.stock > 0 && <span style={{ marginLeft: '8px', fontSize: '11px', color: '#f59e0b' }}>⚠️ Low</span>}
+                      {product.stock === 0 && <span style={{ marginLeft: '8px', fontSize: '11px', color: '#ef4444' }}>❌ Out</span>}
+                    </div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="empty-state">No products found</div>
+              <div className="empty-state">
+                {showLowStockOnly ? 'No low stock products' : 'No products found'}
+              </div>
             )}
           </div>
 
@@ -1040,7 +631,7 @@ const ProductsManagement = () => {
               </div>
               <div className="form-group">
                 <label>Category:</label>
-                <select name="category" value={formData.category} onChange={handleFormChange} className="date-picker">
+                <select name="category" value={formData.category} onChange={handleFormChange}>
                   <option value="">Select Category</option>
                   <option value="Switches">Switches</option>
                   <option value="Cables">Cables</option>
@@ -1075,17 +666,17 @@ const ProductsManagement = () => {
                   {imagePreview ? (
                     <div>
                       <img src={imagePreview} alt="Preview" style={{ maxWidth: '200px', maxHeight: '200px', marginBottom: '1rem' }} />
-                      <p>Click or drag another image to change</p>
+                      <p>Click or drag another image</p>
                     </div>
                   ) : formData.photo && !imagePreview ? (
                     <div>
                       <img src={formData.photo} alt="Current" style={{ maxWidth: '200px', maxHeight: '200px', marginBottom: '1rem' }} />
-                      <p>Click or drag image to change</p>
+                      <p>Click or drag to change</p>
                     </div>
                   ) : (
                     <div>
                       <div style={{ fontSize: '48px', marginBottom: '1rem' }}>📸</div>
-                      <p>Drag & drop an image here or click to browse</p>
+                      <p>Drag & drop image here or click</p>
                     </div>
                   )}
                 </div>
@@ -1113,7 +704,13 @@ const ProductsManagement = () => {
                 <p><strong>Manufactured Country:</strong> {selectedProduct.manufactured_country || 'Not specified'}</p>
                 <p><strong>Brand:</strong> {selectedProduct.brand || 'Not specified'}</p>
                 <p><strong>Price:</strong> RS. {selectedProduct.price?.toFixed(2)}</p>
-                <p><strong>Stock:</strong> {selectedProduct.stock}</p>
+                <p><strong>Stock:</strong> 
+                  <span style={{ color: getStatusColor(selectedProduct.stock), fontWeight: 'bold' }}>
+                    {selectedProduct.stock}
+                  </span>
+                  {selectedProduct.stock <= 20 && selectedProduct.stock > 0 && <span style={{ marginLeft: '10px', color: '#f59e0b' }}>⚠️ Low Stock!</span>}
+                  {selectedProduct.stock === 0 && <span style={{ marginLeft: '10px', color: '#ef4444' }}>❌ Out of Stock!</span>}
+                </p>
               </div>
             </div>
             <div className="action-buttons">
