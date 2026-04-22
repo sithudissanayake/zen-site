@@ -2,11 +2,10 @@ package com.zenvora.service;
 
 import com.zenvora.model.Order;
 import com.zenvora.repository.OrderRepository;
-import com.zenvora.repository.OrderItemRepository;
+
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-import com.itextpdf.text.pdf.draw.LineSeparator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +38,7 @@ public class OrderService {
     @Autowired
     private OrderRepository orderRepository;
     
-    @Autowired
-    private OrderItemRepository orderItemRepository;
+   
 
     // ========== ADMIN METHODS ==========
     

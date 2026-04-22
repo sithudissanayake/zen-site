@@ -20,6 +20,7 @@ const ProductsManagement = () => {
   const [reportData, setReportData] = useState(null);
 
   // Image upload states
+  // eslint-disable-next-line no-unused-vars
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
 
@@ -145,93 +146,471 @@ const ProductsManagement = () => {
     setReportData(null);
   };
 
-  // Generate and Download PDF
-  const downloadPDFReport = async () => {
-    console.log('=== DOWNLOADING PDF REPORT ===');
-    
-    try {
-      // Create HTML content for PDF
-      const htmlContent = generateReportHTML();
-      
-      // Send to backend to generate PDF
-      const response = await fetch(`${API_URL}/api/reports/stock`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ html: htmlContent })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to generate PDF');
-      }
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `stock_count_report_${new Date().toISOString().split('T')[0]}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-      
-      alert('PDF Report downloaded successfully!');
-    } catch (error) {
-      console.error('Error downloading PDF:', error);
-      alert('Error downloading PDF report. Please try again.');
+  // Generate and Download PDF using browser print
+  const downloadPDFReport = () => {
+    if (!reportData) {
+      alert('Please view the report first before downloading PDF.');
+      return;
     }
-  };
-
-  const generateReportHTML = () => {
-    return `
+    
+    const printWindow = window.open('', '_blank');
+    
+    // Logo URL - replace with your actual logo path
+    const logoUrl = '/zen.jpg'; // Place your logo in public folder or use URL
+    
+    // Find max stock for scaling
+    const maxStockValue = Math.max(...Object.values(reportData.categoryStockMap), 1);
+    const categories = Object.entries(reportData.categoryStockMap);
+    
+    const htmlContent = `
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Stock Count Report</title>
+        <title>Stock Count Report - Zenvora</title>
+        <meta charset="UTF-8">
         <style>
-          body { font-family: Arial, sans-serif; margin: 40px; }
-          h1 { color: #333; text-align: center; }
-          .header { text-align: center; margin-bottom: 30px; }
-          .summary { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 30px; }
-          .card { background: #f5f5f5; padding: 15px; border-radius: 8px; text-align: center; }
-          .card-value { font-size: 24px; font-weight: bold; color: #4f46e5; }
-          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-          th { background: #4f46e5; color: white; }
-          .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #666; }
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 30px;
+            background: white;
+            color: #1e293b;
+          }
+          
+          .report-container {
+            max-width: 1200px;
+            margin: 0 auto;
+          }
+          
+          /* Header with Logo */
+          .header {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            color: white;
+            padding: 25px 35px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          
+          .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+          }
+          
+          .logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            object-fit: cover;
+          }
+          
+          .company-info h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            font-weight: bold;
+          }
+          
+          .company-info p {
+            font-size: 12px;
+            opacity: 0.8;
+          }
+          
+          .report-info {
+            text-align: right;
+          }
+          
+          .report-info h2 {
+            font-size: 20px;
+            margin-bottom: 5px;
+          }
+          
+          .report-info p {
+            font-size: 11px;
+            opacity: 0.8;
+          }
+          
+          /* Summary Cards */
+          .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+          }
+          
+          .card {
+            background: #f8fafc;
+            padding: 18px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+          }
+          
+          .card-value {
+            font-size: 26px;
+            font-weight: bold;
+            color: #4f46e5;
+            margin-bottom: 5px;
+          }
+          
+          .card-title {
+            font-size: 12px;
+            color: #64748b;
+          }
+          
+          /* Graph Section */
+          .graph-section {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+          }
+          
+          .graph-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #1e293b;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4f46e5;
+          }
+          
+          .graph-wrapper {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+          }
+          
+          .y-axis-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin-right: 15px;
+            text-align: right;
+            height: 250px;
+          }
+          
+          .y-axis-label {
+            font-size: 11px;
+            color: #64748b;
+            position: relative;
+            line-height: 1;
+          }
+          
+          .bars-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 30px;
+            min-height: 250px;
+          }
+          
+          .bar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100px;
+          }
+          
+          .bar-category {
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 10px;
+            text-align: center;
+          }
+          
+          .bar-outer {
+            height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            position: relative;
+            width: 100%;
+          }
+          
+          .bar {
+            width: 65px;
+            background: linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 8px 8px 0 0;
+            transition: height 0.3s ease;
+            position: relative;
+          }
+          
+          .bar-value {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            font-weight: bold;
+            color: #4f46e5;
+            white-space: nowrap;
+          }
+          
+          .x-axis-label {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+          }
+          
+          .graph-legend {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+          }
+          
+          .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #475569;
+          }
+          
+          .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            background: linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%);
+          }
+          
+          /* Table */
+          .table-wrapper {
+            overflow-x: auto;
+            margin-bottom: 25px;
+          }
+          
+          .table-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #1e293b;
+          }
+          
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+          }
+          
+          th {
+            background: #4f46e5;
+            color: white;
+            padding: 12px 10px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+          }
+          
+          td {
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 11px;
+          }
+          
+          tr:last-child td {
+            border-bottom: none;
+          }
+          
+          .stock-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 11px;
+            color: white;
+          }
+          
+          .footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            color: #94a3b8;
+            font-size: 10px;
+          }
+          
+          @media print {
+            body {
+              padding: 15px;
+            }
+            .header {
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .bar {
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            th {
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+          }
         </style>
       </head>
       <body>
-        <div class="header">
-          <h1>Stock Count Report</h1>
-          <p>Generated: ${new Date().toLocaleString()}</p>
-          <p>Category: ${reportCategory === 'all' ? 'All Categories' : reportCategory}</p>
+        <div class="report-container">
+          <!-- Header with Logo -->
+          <div class="header">
+            <div class="header-left">
+              <img src="${logoUrl}" alt="Zenvora Logo" class="logo" onerror="this.style.display='none'">
+              <div class="company-info">
+                <h1>ZENVORA</h1>
+                <p>Inventory Management System</p>
+              </div>
+            </div>
+            <div class="report-info">
+              <h2>Stock Count Report</h2>
+              <p>Generated: ${new Date(reportData.generatedAt).toLocaleString()}</p>
+              <p>Category: ${reportData.category === 'all' ? 'All Categories' : reportData.category}</p>
+              <p>Sorted by: ${reportData.sortBy === 'stock' ? 'Stock Level (Highest First)' : 'Product Name (A-Z)'}</p>
+            </div>
+          </div>
+          
+          <!-- Summary Cards -->
+          <div class="summary-grid">
+            <div class="card">
+              <div class="card-value">${reportData.totalProducts}</div>
+              <div class="card-title">Total Products</div>
+            </div>
+            <div class="card">
+              <div class="card-value">${reportData.totalStock}</div>
+              <div class="card-title">Total Stock</div>
+            </div>
+            <div class="card">
+              <div class="card-value">Rs. ${reportData.totalValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+              <div class="card-title">Total Value</div>
+            </div>
+            <div class="card">
+              <div class="card-value" style="color: #f59e0b">${reportData.lowStockCount}</div>
+              <div class="card-title">Low Stock (&lt;20)</div>
+            </div>
+            <div class="card">
+              <div class="card-value" style="color: #ef4444">${reportData.outOfStockCount}</div>
+              <div class="card-title">Out of Stock</div>
+            </div>
+          </div>
+          
+          <!-- Bar Graph -->
+          <div class="graph-section">
+            <div class="graph-title">📊 Stock Distribution by Category</div>
+            <div class="graph-wrapper">
+              <div class="y-axis-container">
+                <div class="y-axis-label">${maxStockValue}</div>
+                <div class="y-axis-label">${Math.round(maxStockValue * 0.75)}</div>
+                <div class="y-axis-label">${Math.round(maxStockValue * 0.5)}</div>
+                <div class="y-axis-label">${Math.round(maxStockValue * 0.25)}</div>
+                <div class="y-axis-label">0</div>
+              </div>
+              <div class="bars-container">
+                ${categories.map(([category, stock]) => {
+                  const barHeight = Math.max((stock / maxStockValue) * 200, 30);
+                  return `
+                    <div class="bar-item">
+                      <div class="bar-category">${category}</div>
+                      <div class="bar-outer">
+                        <div class="bar" style="height: ${barHeight}px;">
+                          <div class="bar-value">${stock}</div>
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+            <div class="x-axis-label">Product Categories</div>
+            <div class="graph-legend">
+              ${categories.map(([category]) => `
+                <div class="legend-item">
+                  <div class="legend-color"></div>
+                  <span>${category}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          
+          <!-- Products Table -->
+          <div class="table-wrapper">
+            <div class="table-title">📋 Product Details by Category</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Product ID</th>
+                  <th>Product Name</th>
+                  <th>Category</th>
+                  <th>Brand</th>
+                  <th>Stock</th>
+                  <th>Price (Rs.)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${reportData.products.map((product, index) => {
+                  let stockColor = '#3b82f6';
+                  if (product.stock === 0) stockColor = '#ef4444';
+                  else if (product.stock < 20) stockColor = '#f59e0b';
+                  else if (product.stock > 100) stockColor = '#10b981';
+                  
+                  return `
+                    <tr>
+                      <td>${index + 1}</td>
+                      <td>${product.id || '-'}</td>
+                      <td>${product.name}</td>
+                      <td>${product.category || '-'}</td>
+                      <td>${product.brand || '-'}</td>
+                      <td><span class="stock-badge" style="background: ${stockColor};">${product.stock || 0}</span></td>
+                      <td>Rs. ${(product.price || 0).toFixed(2)}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Footer -->
+          <div class="footer">
+            <p>Report generated by Zenvora Inventory System</p>
+            <p style="margin-top: 5px;">${new Date().toLocaleString()}</p>
+          </div>
         </div>
-        <div class="summary">
-          <div class="card"><div class="card-value">${reportData?.totalProducts || 0}</div><div>Total Products</div></div>
-          <div class="card"><div class="card-value">${reportData?.totalStock || 0}</div><div>Total Stock</div></div>
-          <div class="card"><div class="card-value">Rs. ${(reportData?.totalValue || 0).toFixed(2)}</div><div>Total Value</div></div>
-          <div class="card"><div class="card-value" style="color:#f59e0b">${reportData?.lowStockCount || 0}</div><div>Low Stock</div></div>
-          <div class="card"><div class="card-value" style="color:#ef4444">${reportData?.outOfStockCount || 0}</div><div>Out of Stock</div></div>
-        </div>
-        <table>
-          <thead><tr><th>#</th><th>Product Name</th><th>Category</th><th>Brand</th><th>Stock</th><th>Price (Rs.)</th></tr></thead>
-          <tbody>
-            ${reportData?.products.map((p, i) => `
-              <tr>
-                <td>${i + 1}</td>
-                <td>${p.name}</td>
-                <td>${p.category || '-'}</td>
-                <td>${p.brand || '-'}</td>
-                <td>${p.stock || 0}</td>
-                <td>Rs. ${(p.price || 0).toFixed(2)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-        <div class="footer">Report generated by Zenvora Inventory System</div>
+        
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+              setTimeout(function() {
+                window.close();
+              }, 500);
+            }, 500);
+          };
+        </script>
       </body>
       </html>
     `;
+    
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
   };
 
   // Image upload handlers
@@ -329,6 +708,7 @@ const ProductsManagement = () => {
         setImageFile(null);
       }
       setFormData({
+        id: selectedProduct.id,
         name: selectedProduct.name,
         description: selectedProduct.description || '',
         manufactured_country: selectedProduct.manufactured_country || '',
@@ -372,18 +752,23 @@ const ProductsManagement = () => {
     }));
   };
 
+  // ✅ FIXED: Handle form submission with auto-generated ID
   const handleSubmitForm = async (e) => {
     e.preventDefault();
 
     try {
       let response;
       if (isAdding) {
+        // ✅ Remove id field for new products (let backend generate it)
+        const { id, ...productData } = formData;
+        
         response = await fetch(`${API_URL}/api/products`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
+          body: JSON.stringify(productData)
         });
       } else {
+        // ✅ For editing, include the id
         response = await fetch(`${API_URL}/api/products/${selectedProduct.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -404,11 +789,11 @@ const ProductsManagement = () => {
         }
         fetchProducts();
       } else {
-        alert('Error saving product');
+        alert('Error saving product: ' + (data.message || 'Unknown error'));
       }
     } catch (error) {
       console.error('Error saving product:', error);
-      alert('Error saving product');
+      alert('Error saving product: ' + error.message);
     }
   };
 

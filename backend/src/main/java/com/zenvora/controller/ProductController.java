@@ -2,7 +2,6 @@ package com.zenvora.controller;
 
 import com.zenvora.model.Product;
 import com.zenvora.service.ProductService;
-import com.zenvora.service.ProductService.ProductStockUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -21,7 +20,6 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
-    
 
     // TEST endpoint - to check if API is working
     @GetMapping("/test")
@@ -40,14 +38,14 @@ public class ProductController {
         try {
             List<Product> products = productService.getAllProductsList();
             System.out.println("GET /api/products/all - Found " + products.size() + " products");
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("data", products);
             response.put("totalItems", products.size());
             response.put("totalPages", 1);
             response.put("currentPage", 0);
-            
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,27 +63,30 @@ public class ProductController {
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String search) {
-        
+
         try {
             System.out.println("GET /api/products - page=" + page + ", size=" + size + ", category=" + category + ", search=" + search);
-            
+
             Page<Product> productsPage;
-            
+
             if (search != null && !search.isEmpty()) {
+                // FIXED: advancedSearch(category, search, page, size) — all 4 args
                 productsPage = productService.advancedSearch(category, search, page, size);
             } else if (category != null && !category.isEmpty() && !category.equals("all")) {
+                // FIXED: use overloaded getProductsByCategory(String, int, int) that accepts pagination
                 productsPage = productService.getProductsByCategory(category, page, size);
             } else {
-                productsPage = productService.getAllProducts(page, size, "createdAt");
+                // FIXED: getAllProducts(page, limit, search, category) — all 4 args
+                productsPage = productService.getAllProducts(page, size, null, null);
             }
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("data", productsPage.getContent());
             response.put("currentPage", productsPage.getNumber());
             response.put("totalItems", productsPage.getTotalElements());
             response.put("totalPages", productsPage.getTotalPages());
-            
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -98,6 +99,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getProductById(@PathVariable String id) {
+        id = id.toUpperCase();
         try {
             Optional<Product> productOpt = productService.getProductById(id);
             if (productOpt.isPresent()) {
@@ -138,6 +140,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, Object>> updateProduct(@PathVariable String id, @RequestBody Product product) {
+        id = id.toUpperCase();
         try {
             Product updatedProduct = productService.updateProduct(id, product);
             Map<String, Object> response = new HashMap<>();
@@ -155,6 +158,7 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> deleteProduct(@PathVariable String id) {
+        id = id.toUpperCase();
         try {
             productService.deleteProduct(id);
             Map<String, Object> response = new HashMap<>();
@@ -169,9 +173,36 @@ public class ProductController {
         }
     }
 
+    // Change product ID endpoint
+    @PutMapping("/{id}/change-id")
+    public ResponseEntity<Map<String, Object>> changeProductId(@PathVariable String id, @RequestBody Map<String, String> payload) {
+        id = id.toUpperCase();
+        try {
+            String newId = payload.get("newId");
+            if (newId == null || newId.isEmpty()) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("success", false);
+                error.put("message", "New ID is required");
+                return ResponseEntity.badRequest().body(error);
+            }
+            Product updatedProduct = productService.changeProductId(id, newId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Product ID changed successfully");
+            response.put("data", updatedProduct);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+    }
+
     // Stock management endpoints
     @PatchMapping("/{id}/stock/decrease")
     public ResponseEntity<Map<String, Object>> decreaseStock(@PathVariable String id, @RequestBody Map<String, Integer> payload) {
+        id = id.toUpperCase();
         try {
             Integer quantity = payload.get("quantity");
             if (quantity == null || quantity <= 0) {
@@ -180,9 +211,9 @@ public class ProductController {
                 error.put("message", "Valid quantity is required");
                 return ResponseEntity.badRequest().body(error);
             }
-            
+
             productService.decreaseStock(id, quantity);
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Stock decreased successfully");
@@ -197,6 +228,7 @@ public class ProductController {
 
     @PatchMapping("/{id}/stock/increase")
     public ResponseEntity<Map<String, Object>> increaseStock(@PathVariable String id, @RequestBody Map<String, Integer> payload) {
+        id = id.toUpperCase();
         try {
             Integer quantity = payload.get("quantity");
             if (quantity == null || quantity <= 0) {
@@ -205,9 +237,9 @@ public class ProductController {
                 error.put("message", "Valid quantity is required");
                 return ResponseEntity.badRequest().body(error);
             }
-            
+
             productService.increaseStock(id, quantity);
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Stock increased successfully");
