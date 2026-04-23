@@ -9,21 +9,21 @@ import './ManageDrivers.css';
 
 const EMPTY = {
   driverId: '', 
-  name: '',
+  name: '',        // Changed from driverName
   vehicleType: '',
   vehicleNo: '', 
-  phone: '',
+  phone: '',       // Changed from contactNo
   address: '',
   status: 'ACTIVE'
 };
 
 const FIELDS = [
-  { num: 1, label: 'Driver Name', name: 'name', ph: 'e.g. T. Perera' },
-  { num: 2, label: 'Driver ID', name: 'driverId', ph: 'e.g. D001' },
-  { num: 3, label: 'Vehicle Type', name: 'vehicleType', ph: 'e.g. Lorry' },
-  { num: 4, label: 'Vehicle No', name: 'vehicleNo', ph: 'e.g. WP GA-1234' },
-  { num: 5, label: 'Contact No', name: 'phone', ph: 'e.g. 0708956456' },
-  { num: 6, label: 'Address', name: 'address', ph: 'e.g. 56/B, Payagala' },
+  { num:1, label:'Driver Name',  name:'name',  ph:'e.g. T. Perera' },
+  { num:2, label:'Driver ID',    name:'driverId',    ph:'e.g. D001' },
+  { num:3, label:'Vehicle Type', name:'vehicleType', ph:'e.g. Lorry' },
+  { num:4, label:'Vehicle No',   name:'vehicleNo',   ph:'e.g. WP GA-1234' },
+  { num:5, label:'Contact No',   name:'phone',       ph:'e.g. 0708956456' },
+  { num:6, label:'Address',      name:'address',     ph:'e.g. 56/B, Payagala' },
 ];
 
 export default function ManageDrivers({ onNavigate }) {
@@ -39,19 +39,31 @@ export default function ManageDrivers({ onNavigate }) {
   }, []);
 
   const fetchDrivers = async () => {
-    setTblLoading(true);
-    try {
-      const res = await getAllDrivers();
-      const driversData = Array.isArray(res.data) ? res.data : [];
-      setDrivers(driversData);
-    } catch (error) {
-      console.error('Error fetching drivers:', error);
-      showAlert('Could not load drivers. Is the backend running?', 'error');
-      setDrivers([]);
-    } finally {
-      setTblLoading(false);
+  setTblLoading(true);
+  try {
+    const res = await getAllDrivers();
+    console.log('Fetch drivers response:', res);
+    
+    // Handle different response structures
+    let driversData = [];
+    if (res.data && Array.isArray(res.data)) {
+      driversData = res.data;
+    } else if (res.data && res.data.data && Array.isArray(res.data.data)) {
+      driversData = res.data.data;
+    } else if (Array.isArray(res)) {
+      driversData = res;
     }
-  };
+    
+    console.log('Processed drivers data:', driversData);
+    setDrivers(driversData);
+  } catch (error) {
+    console.error('Error fetching drivers:', error);
+    showAlert('Could not load drivers. Is the backend running?', 'error');
+    setDrivers([]);
+  } finally {
+    setTblLoading(false);
+  }
+};
 
   const showAlert = (msg, type) => {
     setAlert({ msg, type });

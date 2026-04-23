@@ -68,7 +68,7 @@ public class OrderService {
                             ? savedOrder.getCity()
                             : address + ", " + savedOrder.getCity();
                 }
-                delivery.setAddress(address);
+                delivery.setDeliveryAddress(address);
                 delivery.setStatus("PENDING");
                 delivery.setDeliveryDate(LocalDate.now().plusDays(3));
                 // @PrePersist on DeliveryOrder handles createdAt/updatedAt

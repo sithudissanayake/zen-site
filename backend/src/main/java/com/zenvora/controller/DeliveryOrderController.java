@@ -14,63 +14,30 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/delivery-orders")
-@CrossOrigin(originPatterns = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost:3000")
 public class DeliveryOrderController {
 
     @Autowired
     private DeliveryOrderService deliveryOrderService;
 
-    // -----------------------------------------------------------------------
-    // GET all delivery orders — enriched with full Order details
-    // Use ?status=PENDING to filter by status
-    // -----------------------------------------------------------------------
+    // Get all delivery orders
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getAllDeliveryOrders(
-            @RequestParam(required = false) String status) {
+    public ResponseEntity<Map<String, Object>> getAllDeliveryOrders() {
         try {
-            List<Map<String, Object>> orders;
-            if (status != null && !status.isEmpty()) {
-                orders = deliveryOrderService.getDeliveryOrdersByStatusEnriched(status);
-            } else {
-                orders = deliveryOrderService.getAllDeliveryOrdersEnriched();
-            }
+            List<DeliveryOrder> orders = deliveryOrderService.getAllDeliveryOrders();
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("data", orders);
-            response.put("count", orders.size());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            Map<String, Object> err = new HashMap<>();
-            err.put("success", false);
-            err.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
-    // -----------------------------------------------------------------------
-    // GET delivery orders for a specific driver — enriched
-    // -----------------------------------------------------------------------
-    @GetMapping("/driver/{driverId}")
-    public ResponseEntity<Map<String, Object>> getByDriver(@PathVariable String driverId) {
-        try {
-            List<Map<String, Object>> orders =
-                    deliveryOrderService.getDeliveryOrdersByDriverEnriched(driverId);
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("data", orders);
-            response.put("count", orders.size());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, Object> err = new HashMap<>();
-            err.put("success", false);
-            err.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
-        }
-    }
-
-    // -----------------------------------------------------------------------
-    // GET delivery order by primary key (Long)
-    // -----------------------------------------------------------------------
+    // Get delivery order by ID
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getDeliveryOrderById(@PathVariable Long id) {
         try {
@@ -86,72 +53,66 @@ public class DeliveryOrderController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
         } catch (Exception e) {
-            Map<String, Object> err = new HashMap<>();
-            err.put("success", false);
-            err.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
-    // -----------------------------------------------------------------------
-    // GET delivery order by orderId (the Order's PK as String) — enriched
-    // -----------------------------------------------------------------------
-    @GetMapping("/by-order-id/{orderId}")
-    public ResponseEntity<Map<String, Object>> getDeliveryOrderByOrderId(@PathVariable String orderId) {
+    // Get delivery orders by status
+    @GetMapping("/status/{status}")
+    public ResponseEntity<Map<String, Object>> getDeliveryOrdersByStatus(@PathVariable String status) {
         try {
-            Map<String, Object> enriched =
-                    deliveryOrderService.getDeliveryOrderByOrderIdEnriched(orderId);
+            List<DeliveryOrder> orders = deliveryOrderService.getDeliveryOrdersByStatus(status);
             Map<String, Object> response = new HashMap<>();
-            if (enriched != null) {
-                response.put("success", true);
-                response.put("data", enriched);
-                return ResponseEntity.ok(response);
-            } else {
-                response.put("success", false);
-                response.put("message", "Delivery order not found for order ID: " + orderId);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
+            response.put("success", true);
+            response.put("data", orders);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            Map<String, Object> err = new HashMap<>();
-            err.put("success", false);
-            err.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
-    // -----------------------------------------------------------------------
-    // POST — create a delivery order manually
-    // -----------------------------------------------------------------------
+    // Create delivery order
     @PostMapping
     public ResponseEntity<Map<String, Object>> createDeliveryOrder(@RequestBody DeliveryOrder order) {
         try {
-            DeliveryOrder created = deliveryOrderService.createDeliveryOrder(order);
+            // Check if order already exists
+            if (deliveryOrderService.existsByOrderId(order.getOrderId())) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "Order already scheduled");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            }
+            
+            DeliveryOrder createdOrder = deliveryOrderService.createDeliveryOrder(order);
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Delivery order created successfully");
-            response.put("data", created);
+            response.put("data", createdOrder);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
-            Map<String, Object> err = new HashMap<>();
-            err.put("success", false);
-            err.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
-    // -----------------------------------------------------------------------
-    // PUT — update delivery order details
-    // -----------------------------------------------------------------------
+    // Update delivery order
     @PutMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> updateDeliveryOrder(
-            @PathVariable Long id, @RequestBody DeliveryOrder order) {
+    public ResponseEntity<Map<String, Object>> updateDeliveryOrder(@PathVariable Long id, @RequestBody DeliveryOrder order) {
         try {
-            DeliveryOrder updated = deliveryOrderService.updateDeliveryOrder(id, order);
+            DeliveryOrder updatedOrder = deliveryOrderService.updateDeliveryOrder(id, order);
             Map<String, Object> response = new HashMap<>();
-            if (updated != null) {
+            if (updatedOrder != null) {
                 response.put("success", true);
                 response.put("message", "Delivery order updated successfully");
-                response.put("data", updated);
+                response.put("data", updatedOrder);
                 return ResponseEntity.ok(response);
             } else {
                 response.put("success", false);
@@ -159,28 +120,24 @@ public class DeliveryOrderController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
         } catch (Exception e) {
-            Map<String, Object> err = new HashMap<>();
-            err.put("success", false);
-            err.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
-    // -----------------------------------------------------------------------
-    // PATCH /{id}/status  — update status only (also syncs back to Order)
-    // Body: { "status": "IN_TRANSIT" }
-    // -----------------------------------------------------------------------
+    // Update delivery order status
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Map<String, Object>> updateStatus(
-            @PathVariable Long id, @RequestBody Map<String, String> payload) {
+    public ResponseEntity<Map<String, Object>> updateDeliveryOrderStatus(@PathVariable Long id, @RequestBody Map<String, String> statusMap) {
         try {
-            String status = payload.get("status");
-            DeliveryOrder updated = deliveryOrderService.updateStatus(id, status);
+            String status = statusMap.get("status");
+            DeliveryOrder updatedOrder = deliveryOrderService.updateDeliveryOrderStatus(id, status);
             Map<String, Object> response = new HashMap<>();
-            if (updated != null) {
+            if (updatedOrder != null) {
                 response.put("success", true);
                 response.put("message", "Status updated successfully");
-                response.put("data", updated);
+                response.put("data", updatedOrder);
                 return ResponseEntity.ok(response);
             } else {
                 response.put("success", false);
@@ -188,72 +145,14 @@ public class DeliveryOrderController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
         } catch (Exception e) {
-            Map<String, Object> err = new HashMap<>();
-            err.put("success", false);
-            err.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
-    // -----------------------------------------------------------------------
-    // PATCH /{id}/assign-driver  — assign a driver
-    // Body: { "driverId": "D001" }
-    // -----------------------------------------------------------------------
-    @PatchMapping("/{id}/assign-driver")
-    public ResponseEntity<Map<String, Object>> assignDriver(
-            @PathVariable Long id, @RequestBody Map<String, String> payload) {
-        try {
-            String driverId = payload.get("driverId");
-            if (driverId == null || driverId.isEmpty()) {
-                Map<String, Object> err = new HashMap<>();
-                err.put("success", false);
-                err.put("message", "driverId is required");
-                return ResponseEntity.badRequest().body(err);
-            }
-            DeliveryOrder updated = deliveryOrderService.assignDriver(id, driverId);
-            Map<String, Object> response = new HashMap<>();
-            if (updated != null) {
-                response.put("success", true);
-                response.put("message", "Driver assigned successfully");
-                response.put("data", updated);
-                return ResponseEntity.ok(response);
-            } else {
-                response.put("success", false);
-                response.put("message", "Delivery order not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
-        } catch (Exception e) {
-            Map<String, Object> err = new HashMap<>();
-            err.put("success", false);
-            err.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
-        }
-    }
-
-    // -----------------------------------------------------------------------
-    // POST /sync  — scan all Orders and create DeliveryOrders for any
-    //               that don't have one yet (historical data fix)
-    // -----------------------------------------------------------------------
-    @PostMapping("/sync")
-    public ResponseEntity<Map<String, Object>> syncOrdersToDelivery() {
-        try {
-            int created = deliveryOrderService.syncOrdersToDelivery();
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Sync complete. DeliveryOrders created: " + created);
-            response.put("createdCount", created);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, Object> err = new HashMap<>();
-            err.put("success", false);
-            err.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
-        }
-    }
-
-    // -----------------------------------------------------------------------
-    // DELETE /{id}
-    // -----------------------------------------------------------------------
+    // Delete delivery order
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> deleteDeliveryOrder(@PathVariable Long id) {
         try {
@@ -263,10 +162,10 @@ public class DeliveryOrderController {
             response.put("message", "Delivery order deleted successfully");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            Map<String, Object> err = new HashMap<>();
-            err.put("success", false);
-            err.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 }
