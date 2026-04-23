@@ -9,59 +9,137 @@ public class Driver {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;  // This should be Long, not String
+    private Long id;
     
-    @Column(unique = true)
+    @Column(name = "driver_id", unique = true)
     private String driverId;
     
-    private String name;  // This is the field name, not driverName
+    @Column(nullable = false)
+    private String name;
     
-    @Column(unique = true)
+    @Column(name = "license_number", unique = true)
     private String licenseNumber;
     
-    @Column(unique = true)
+    @Column(nullable = false)
     private String phone;
     
     private String status;
     
     @Column(name = "vehicle_no")
-    private String vehicleNo;  // Add this if you need existsByVehicleNo
+    private String vehicleNo;
     
-    private String vehicleType;  // Add this if you need findByVehicleType
+    @Column(name = "vehicle_type")
+    private String vehicleType;
     
-    @Column(updatable = false)
+    @Column(name = "address", columnDefinition = "VARCHAR(200)")  // Make sure this is correct
+    private String address;
+    
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
     
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
+    // Constructors
+    public Driver() {}
+    
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() { 
+        return id; 
+    }
     
-    public String getDriverId() { return driverId; }
-    public void setDriverId(String driverId) { this.driverId = driverId; }
+    public void setId(Long id) { 
+        this.id = id; 
+    }
     
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getDriverId() { 
+        return driverId; 
+    }
     
-    public String getLicenseNumber() { return licenseNumber; }
-    public void setLicenseNumber(String licenseNumber) { this.licenseNumber = licenseNumber; }
+    public void setDriverId(String driverId) { 
+        this.driverId = driverId; 
+    }
     
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public String getName() { 
+        return name; 
+    }
     
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public void setName(String name) { 
+        this.name = name; 
+    }
     
-    public String getVehicleNo() { return vehicleNo; }
-    public void setVehicleNo(String vehicleNo) { this.vehicleNo = vehicleNo; }
+    public String getLicenseNumber() { 
+        return licenseNumber; 
+    }
     
-    public String getVehicleType() { return vehicleType; }
-    public void setVehicleType(String vehicleType) { this.vehicleType = vehicleType; }
+    public void setLicenseNumber(String licenseNumber) { 
+        this.licenseNumber = licenseNumber; 
+    }
     
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public String getPhone() { 
+        return phone; 
+    }
     
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public void setPhone(String phone) { 
+        this.phone = phone; 
+    }
+    
+    public String getStatus() { 
+        return status; 
+    }
+    
+    public void setStatus(String status) { 
+        this.status = status; 
+    }
+    
+    public String getVehicleNo() { 
+        return vehicleNo; 
+    }
+    
+    public void setVehicleNo(String vehicleNo) { 
+        this.vehicleNo = vehicleNo; 
+    }
+    
+    public String getVehicleType() { 
+        return vehicleType; 
+    }
+    
+    public void setVehicleType(String vehicleType) { 
+        this.vehicleType = vehicleType; 
+    }
+    
+    public String getAddress() { 
+        return address; 
+    }
+    
+    public void setAddress(String address) { 
+        this.address = address; 
+    }
+    
+    public LocalDateTime getCreatedAt() { 
+        return createdAt; 
+    }
+    
+    public void setCreatedAt(LocalDateTime createdAt) { 
+        this.createdAt = createdAt; 
+    }
+    
+    public LocalDateTime getUpdatedAt() { 
+        return updatedAt; 
+    }
+    
+    public void setUpdatedAt(LocalDateTime updatedAt) { 
+        this.updatedAt = updatedAt; 
+    }
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

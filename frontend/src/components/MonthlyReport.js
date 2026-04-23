@@ -14,7 +14,6 @@ import './MonthlyReport.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-/* Bar colours – cycles if more than 6 drivers */
 const BAR_COLORS = [
   'rgba(58,91,191,.82)',
   'rgba(251,140,0,.82)',
@@ -32,50 +31,60 @@ const BAR_BORDERS = [
   'rgb(79,195,247)',
 ];
 
-export default function MonthlyReport() {
+export default function MonthlyReport({ onNavigate }) {
   const [drivers, setDrivers] = useState([]);
-  const [orders,  setOrders]  = useState([]);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [alert,   setAlert]   = useState({ msg:'', type:'' });
+  const [alert, setAlert] = useState({ msg: '', type: '' });
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
     setLoading(true);
     try {
       const [dRes, oRes] = await Promise.all([getAllDrivers(), getAllOrders()]);
-      setDrivers(dRes.data);
-      setOrders(oRes.data);
-    } catch {
+      const driversData = Array.isArray(dRes.data) ? dRes.data : [];
+      const ordersData = Array.isArray(oRes.data) ? oRes.data : [];
+      setDrivers(driversData);
+      setOrders(ordersData);
+    } catch (error) {
+      console.error('Error fetching data:', error);
       showAlert('Could not load report data. Is the backend running?', 'error');
-    } finally { setLoading(false); }
+      setDrivers([]);
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const showAlert = (msg, type) => {
     setAlert({ msg, type });
-    setTimeout(() => setAlert({ msg:'', type:'' }), 3500);
+    setTimeout(() => setAlert({ msg: '', type: '' }), 3500);
   };
 
-  /* ── Stats ── */
+  const handleBackClick = () => {
+    if (onNavigate) {
+      onNavigate('DeliveryHome');
+    }
+  };
+
   const driverStats = drivers.map(d => ({
     ...d,
     total: orders.filter(o => o.driverId === d.driverId).length,
   }));
-  const sorted     = [...driverStats].sort((a, b) => b.total - a.total);
-  const totalOrds  = orders.length;
-  const totalDrvs  = drivers.length;
-  const topDriver  = sorted[0];
-  const avg        = totalDrvs > 0 ? (totalOrds / totalDrvs).toFixed(1) : 0;
+  const sorted = [...driverStats].sort((a, b) => b.total - a.total);
+  const totalOrds = orders.length;
+  const totalDrvs = drivers.length;
+  const topDriver = sorted[0];
+  const avg = totalDrvs > 0 ? (totalOrds / totalDrvs).toFixed(1) : 0;
 
-  /* ── Chart data ── */
   const chartData = {
-    labels: sorted.map(d => d.driverName),
+    labels: sorted.map(d => d.name),
     datasets: [{
       label: 'Total Deliveries',
       data: sorted.map(d => d.total),
       backgroundColor: sorted.map((_, i) => BAR_COLORS[i % BAR_COLORS.length]),
-      borderColor:     sorted.map((_, i) => BAR_BORDERS[i % BAR_BORDERS.length]),
+      borderColor: sorted.map((_, i) => BAR_BORDERS[i % BAR_BORDERS.length]),
       borderWidth: 2,
       borderRadius: 8,
       borderSkipped: false,
@@ -89,39 +98,47 @@ export default function MonthlyReport() {
       legend: {
         position: 'top',
         labels: {
-          font: { family:'Nunito', size:13, weight:'700' },
-          color: '#1a2a5e', padding:20,
+          font: { family: 'Nunito', size: 13, weight: '700' },
+          color: '#1a2a5e', padding: 20,
         },
       },
       title: {
         display: true,
         text: 'Monthly Delivery Report',
-        font: { family:'Rajdhani', size:20, weight:'700' },
+        font: { family: 'Rajdhani', size: 20, weight: '700' },
         color: '#1a2a5e',
-        padding: { bottom:20 },
+        padding: { bottom: 20 },
       },
       tooltip: {
         callbacks: { label: ctx => ` ${ctx.parsed.y} deliveries` },
-        bodyFont:  { family:'Nunito', size:13 },
-        titleFont: { family:'Nunito', size:13, weight:'700' },
+        bodyFont: { family: 'Nunito', size: 13 },
+        titleFont: { family: 'Nunito', size: 13, weight: '700' },
       },
     },
     scales: {
       y: {
         beginAtZero: true,
-        ticks: { stepSize:1, font:{ family:'Nunito', size:12 }, color:'#7a93c8' },
-        grid:  { color:'rgba(168,196,232,.35)' },
+        ticks: { stepSize: 1, font: { family: 'Nunito', size: 12 }, color: '#7a93c8' },
+        grid: { color: 'rgba(168,196,232,.35)' },
       },
       x: {
-        ticks: { font:{ family:'Nunito', size:12, weight:'700' }, color:'#1a2a5e' },
-        grid:  { display:false },
+        ticks: { font: { family: 'Nunito', size: 12, weight: '700' }, color: '#1a2a5e' },
+        grid: { display: false },
       },
     },
   };
 
   return (
     <div className="page-wrapper">
-      <h1 className="page-title">Monthly Delivery Report</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h1 className="page-title" style={{ margin: 0 }}>Monthly Delivery Report</h1>
+        <button 
+          onClick={handleBackClick}
+          style={{ padding: '10px 20px', backgroundColor: '#667eea', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
+        >
+          ← Back to Delivery
+        </button>
+      </div>
 
       {alert.msg && (
         <div className={`alert alert-${alert.type}`}>{alert.msg}</div>
@@ -133,7 +150,6 @@ export default function MonthlyReport() {
         </div>
       ) : (
         <>
-          {/* ── Summary cards ── */}
           <div className="rpt-stats">
             <div className="rpt-stat">
               <span className="rpt-stat-icon">📦</span>
@@ -153,8 +169,8 @@ export default function MonthlyReport() {
             {topDriver && (
               <div className="rpt-stat rpt-stat--top">
                 <span className="rpt-stat-icon">🏆</span>
-                <span className="rpt-stat-num" style={{ fontSize:'1.05rem' }}>
-                  {topDriver.driverName}
+                <span className="rpt-stat-num" style={{ fontSize: '1.05rem' }}>
+                  {topDriver.name}
                 </span>
                 <span className="rpt-stat-lbl">
                   Top Driver · {topDriver.total} orders
@@ -163,7 +179,6 @@ export default function MonthlyReport() {
             )}
           </div>
 
-          {/* ── Table ── */}
           <div className="card rpt-tbl-card">
             {sorted.length === 0 ? (
               <div className="empty-state">
@@ -184,28 +199,20 @@ export default function MonthlyReport() {
                   </thead>
                   <tbody>
                     {sorted.map((d, i) => {
-                      const pct = totalOrds > 0
-                        ? Math.round((d.total / totalOrds) * 100)
-                        : 0;
+                      const pct = totalOrds > 0 ? Math.round((d.total / totalOrds) * 100) : 0;
                       return (
-                        <tr key={d.driverId}>
+                        <tr key={d.id}>
                           <td>
                             <span className="rpt-rank">
                               {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
                             </span>
                           </td>
-                          <td style={{ fontWeight:800 }}>{d.driverName}</td>
-                          <td>
-                            <span className="badge badge-navy">{d.driverId}</span>
-                          </td>
-                          <td>
-                            <span className="badge badge-navy" style={{ minWidth:40 }}>
-                              {d.total}
-                            </span>
-                          </td>
-                          <td style={{ minWidth:130 }}>
+                          <td style={{ fontWeight: 800 }}>{d.name}</td>
+                          <td><span className="badge badge-navy">{d.driverId}</span></td>
+                          <td><span className="badge badge-navy" style={{ minWidth: 40 }}>{d.total}</span></td>
+                          <td style={{ minWidth: 130 }}>
                             <div className="rpt-bar">
-                              <div className="rpt-bar-fill" style={{ width:`${pct}%` }}/>
+                              <div className="rpt-bar-fill" style={{ width: `${pct}%` }}/>
                               <span className="rpt-bar-pct">{pct}%</span>
                             </div>
                           </td>
@@ -218,7 +225,6 @@ export default function MonthlyReport() {
             )}
           </div>
 
-          {/* ── Bar chart ── */}
           <div className="card rpt-chart-card">
             {sorted.length > 0 ? (
               <Bar data={chartData} options={chartOptions} />
@@ -230,7 +236,6 @@ export default function MonthlyReport() {
             )}
           </div>
 
-          {/* ── Footer ── */}
           <div className="rpt-footer">
             <button className="btn btn-secondary" onClick={fetchData}>
               🔄 Refresh

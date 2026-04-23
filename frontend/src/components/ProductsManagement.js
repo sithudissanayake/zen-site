@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useCallback } from 'react';
 
 const ProductsManagement = () => {
@@ -25,6 +27,7 @@ const ProductsManagement = () => {
   const [reportData, setReportData] = useState(null);
 
   // Image upload states
+  // eslint-disable-next-line no-unused-vars
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
 
