@@ -51,43 +51,49 @@ public class Order {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    // Order items are loaded separately via OrderItemRepository — NOT a JPA relation
     @Transient
     private List<OrderItem> items = new ArrayList<>();
+
+    // NOTE: The link to DeliveryOrder is intentionally NOT mapped as a JPA
+    // @OneToOne here. DeliveryOrder holds a plain String orderId column that
+    // stores the Order PK as a string. The join is done in service layer code,
+    // not by Hibernate. This avoids the "mappedBy property does not exist" error.
 
     // Constructors
     public Order() {}
 
     // Getters
-    public Long getOrderId() { return orderId; }
-    public String getOrderNumber() { return orderNumber; }
-    public String getCustomerName() { return customerName; }
-    public String getCustomerEmail() { return customerEmail; }
-    public Long getCustomerId() { return customerId; }
-    public String getCustomerPhone() { return customerPhone; }
-    public String getShippingAddress() { return shippingAddress; }
-    public String getCity() { return city; }
-    public String getOrderNotes() { return orderNotes; }
-    public BigDecimal getTotalAmount() { return totalAmount; }
-    public String getStatus() { return status; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public List<OrderItem> getItems() { return items; }
+    public Long getOrderId()             { return orderId; }
+    public String getOrderNumber()       { return orderNumber; }
+    public String getCustomerName()      { return customerName; }
+    public String getCustomerEmail()     { return customerEmail; }
+    public Long getCustomerId()          { return customerId; }
+    public String getCustomerPhone()     { return customerPhone; }
+    public String getShippingAddress()   { return shippingAddress; }
+    public String getCity()              { return city; }
+    public String getOrderNotes()        { return orderNotes; }
+    public BigDecimal getTotalAmount()   { return totalAmount; }
+    public String getStatus()            { return status; }
+    public LocalDateTime getCreatedAt()  { return createdAt; }
+    public LocalDateTime getUpdatedAt()  { return updatedAt; }
+    public List<OrderItem> getItems()    { return items; }
 
     // Setters
-    public void setOrderId(Long orderId) { this.orderId = orderId; }
-    public void setOrderNumber(String orderNumber) { this.orderNumber = orderNumber; }
-    public void setCustomerName(String customerName) { this.customerName = customerName; }
-    public void setCustomerEmail(String customerEmail) { this.customerEmail = customerEmail; }
-    public void setCustomerId(Long customerId) { this.customerId = customerId; }
-    public void setCustomerPhone(String customerPhone) { this.customerPhone = customerPhone; }
+    public void setOrderId(Long orderId)                 { this.orderId = orderId; }
+    public void setOrderNumber(String orderNumber)       { this.orderNumber = orderNumber; }
+    public void setCustomerName(String customerName)     { this.customerName = customerName; }
+    public void setCustomerEmail(String customerEmail)   { this.customerEmail = customerEmail; }
+    public void setCustomerId(Long customerId)           { this.customerId = customerId; }
+    public void setCustomerPhone(String customerPhone)   { this.customerPhone = customerPhone; }
     public void setShippingAddress(String shippingAddress) { this.shippingAddress = shippingAddress; }
-    public void setCity(String city) { this.city = city; }
-    public void setOrderNotes(String orderNotes) { this.orderNotes = orderNotes; }
-    public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
-    public void setStatus(String status) { this.status = status; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
-    public void setItems(List<OrderItem> items) { this.items = items; }
+    public void setCity(String city)                     { this.city = city; }
+    public void setOrderNotes(String orderNotes)         { this.orderNotes = orderNotes; }
+    public void setTotalAmount(BigDecimal totalAmount)   { this.totalAmount = totalAmount; }
+    public void setStatus(String status)                 { this.status = status; }
+    public void setCreatedAt(LocalDateTime createdAt)    { this.createdAt = createdAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt)    { this.updatedAt = updatedAt; }
+    public void setItems(List<OrderItem> items)          { this.items = items; }
 
     @PrePersist
     protected void onCreate() {

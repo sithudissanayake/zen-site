@@ -5,28 +5,27 @@ import ManageDrivers from './components/ManageDrivers';
 import DeliveryHome from './components/DeliveryHome';
 import ToDeliver from './components/ToDeliver';
 import MonthlyReport from './components/MonthlyReport';
-import AdminOrderList from './pages/AdminOrderList'; // ✅ changed
+import ViewAllDrivers from './components/ViewAllDrivers';  // ADD THIS IMPORT
+import AdminOrderList from './pages/AdminOrderList';
 import OrderDetails from './pages/OrderDetails';
 import './App.css';
 
 function DeliveryModule() {
   const [activeView, setActiveView] = useState('DeliveryHome');
 
-  const isDeliverySection = activeView !== 'ManageDrivers';
-
   return (
     <div className="delivery-module">
       <div className="delivery-subnav">
         <button
           type="button"
-          className={`submodule-item ${isDeliverySection ? 'active' : ''}`}
+          className={`submodule-item ${activeView === 'DeliveryHome' ? 'active' : ''}`}
           onClick={() => setActiveView('DeliveryHome')}
         >
           Delivery
         </button>
         <button
           type="button"
-          className={`submodule-item ${!isDeliverySection ? 'active' : ''}`}
+          className={`submodule-item ${activeView === 'ManageDrivers' || activeView === 'ViewAllDrivers' ? 'active' : ''}`}
           onClick={() => setActiveView('ManageDrivers')}
         >
           Drivers
@@ -35,14 +34,16 @@ function DeliveryModule() {
 
       <div className="delivery-module-content">
         {activeView === 'DeliveryHome' && <DeliveryHome onNavigate={setActiveView} />}
-        {activeView === 'ManageDrivers' && <ManageDrivers />}
-        {activeView === 'ToDeliver' && <ToDeliver />}
-        {activeView === 'MonthlyReport' && <MonthlyReport />}
+        {activeView === 'ManageDrivers' && <ManageDrivers onNavigate={setActiveView} />}
+        {activeView === 'ViewAllDrivers' && <ViewAllDrivers onNavigate={setActiveView} />}
+        {activeView === 'ToDeliver' && <ToDeliver onNavigate={setActiveView} />}
+        {activeView === 'MonthlyReport' && <MonthlyReport onNavigate={setActiveView} />}
       </div>
     </div>
   );
 }
 
+// Rest of your code remains the same...
 function OrdersManagement() {
   const [activeView, setActiveView] = useState('list');
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -73,7 +74,7 @@ function OrdersManagement() {
           onBack={handleBackToList}
         />
       ) : (
-        <AdminOrderList // ✅ changed from OrderList to AdminOrderList
+        <AdminOrderList
           onViewDetails={handleViewDetails}
           onAddNewOrder={handleAddNewOrder}
         />
