@@ -10,15 +10,15 @@ import java.util.Optional;
 @Repository
 public interface DeliveryOrderRepository extends JpaRepository<DeliveryOrder, Long> {
     
-    // Find by orderId (String field)
     Optional<DeliveryOrder> findByOrderId(String orderId);
     
-    // Find by driverId
-    List<DeliveryOrder> findByDriverId(String driverId);
-    
-    // Find by status
     List<DeliveryOrder> findByStatus(String status);
     
-    // Check if exists by orderId
+    List<DeliveryOrder> findByDriverId(String driverId);
+    
+    List<DeliveryOrder> findByPriority(String priority);
+    
     boolean existsByOrderId(String orderId);
+    
+    void deleteByOrderId(String orderId);
 }

@@ -1,100 +1,723 @@
-/* =========================================================
-   MonthlyReport.css
-   ========================================================= */
+/* MonthlyReport.css - Modern Report Styling */
 
-/* ── Summary stat cards ── */
-.rpt-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    animation: slideUp .4s ease;
+/* ============================================
+   Global & Variables
+   ============================================ */
+.rpt-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f8fafc;
+  min-height: 100vh;
+}
+
+/* ============================================
+   Headers
+   ============================================ */
+.rpt-h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rpt-sub {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Print Header (hidden on screen) */
+.rpt-print-hdr {
+  display: none;
+}
+
+/* Screen Header Buttons */
+.rpt-screen-hdr {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 24px;
+  padding: 0 20px;
+}
+
+.rpt-hdr-btns {
+  display: flex;
+  gap: 12px;
+}
+
+/* ============================================
+   Buttons
+   ============================================ */
+.rpt-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rpt-btn--pri {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
+}
+
+.rpt-btn--pri:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(99, 102, 241, 0.3);
+}
+
+.rpt-btn--sec {
+  background: white;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.rpt-btn--sec:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.rpt-btn--out {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.rpt-btn--out:hover {
+  background: #e2e8f0;
+}
+
+.rpt-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   Alert Messages
+   ============================================ */
+.rpt-alert {
+  padding: 14px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-weight: 500;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rpt-alert--success {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+  border-left: 4px solid #10b981;
+}
+
+.rpt-alert--error {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #991b1b;
+  border-left: 4px solid #ef4444;
+}
+
+.rpt-alert--info {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1e40af;
+  border-left: 4px solid #3b82f6;
+}
+
+/* ============================================
+   Filters
+   ============================================ */
+.rpt-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  background: white;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.rpt-fg {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8fafc;
+  padding: 6px 14px;
+  border-radius: 40px;
+  border: 1px solid #e2e8f0;
+}
+
+.rpt-fg label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.rpt-fg select {
+  padding: 6px 10px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e293b;
+  cursor: pointer;
+  outline: none;
+}
+
+.rpt-fg select:hover {
+  color: #6366f1;
+}
+
+/* ============================================
+   Period Line
+   ============================================ */
+.rpt-period {
+  font-size: 13px;
+  color: #64748b;
+  padding: 0 20px;
+  margin-bottom: 24px;
+}
+
+.rpt-period strong {
+  color: #1e293b;
+  background: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+/* ============================================
+   KPI Cards
+   ============================================ */
+.rpt-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+  padding: 0 20px;
+}
+
+.rpt-kpi {
+  background: white;
+  border-radius: 20px;
+  padding: 20px 16px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.rpt-kpi::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--kc, #6366f1);
+}
+
+.rpt-kpi:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.rpt-kpi-val {
+  display: block;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--kc, #1e293b);
+  margin: 8px 0 4px;
+}
+
+.rpt-kpi-val--sm {
+  font-size: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rpt-kpi-lbl {
+  display: block;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================
+   Sections
+   ============================================ */
+.rpt-section {
+  background: white;
+  border-radius: 24px;
+  margin-bottom: 32px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.rpt-sec-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.rpt-sec-cnt {
+  background: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* ============================================
+   Status Breakdown Grid
+   ============================================ */
+.rpt-sb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.rpt-sb-item {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 16px;
+  border-left: 4px solid var(--sc, #6366f1);
+}
+
+/* ============================================
+   Charts Container
+   ============================================ */
+.rpt-charts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+  padding: 0 20px;
+}
+
+@media (max-width: 1024px) {
+  .rpt-charts {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rpt-chart-card {
+  background: white;
+  border-radius: 24px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s;
+}
+
+.rpt-chart-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* ============================================
+   Empty State
+   ============================================ */
+.rpt-empty {
+  text-align: center;
+  padding: 48px 20px;
+  color: #94a3b8;
+  font-size: 14px;
+  background: #f8fafc;
+  border-radius: 16px;
+}
+
+/* ============================================
+   Loading State
+   ============================================ */
+.rpt-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  background: white;
+  border-radius: 24px;
+  margin: 20px;
+}
+
+.rpt-spin {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   Tables
+   ============================================ */
+.rpt-tbl-wrap {
+  overflow-x: auto;
+  border-radius: 16px;
+}
+
+.rpt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.rpt-table th {
+  text-align: left;
+  padding: 14px 12px;
+  background: #f8fafc;
+  font-weight: 700;
+  color: #475569;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.rpt-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+}
+
+.rpt-table tr:hover {
+  background: #f8fafc;
+}
+
+.rpt-table--sm td {
+  padding: 10px 12px;
+}
+
+.rpt-tr-top {
+  background: linear-gradient(90deg, #fef3c7 0%, #fff 100%);
+}
+
+.rpt-tfoot td {
+  background: #f8fafc;
+  font-weight: 600;
+  border-top: 2px solid #e2e8f0;
+}
+
+/* ============================================
+   Badges
+   ============================================ */
+.rpt-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.rpt-b-blue {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.rpt-b-purple {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.rpt-b-green {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.rpt-b-ind {
+  background: #c7d2fe;
+  color: #3730a3;
+}
+
+/* ============================================
+   Progress Bar
+   ============================================ */
+.rpt-bar {
+  position: relative;
+  background: #f1f5f9;
+  border-radius: 99px;
+  height: 24px;
+  overflow: hidden;
+  min-width: 100px;
+}
+
+.rpt-bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: #6366f1;
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+.rpt-bar-pct {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   Signature (Print Only)
+   ============================================ */
+.rpt-sig {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 2px dashed #e2e8f0;
+}
+
+.rpt-sig-box {
+  flex: 1;
+  text-align: center;
+}
+
+.rpt-sig-line {
+  height: 1px;
+  background: #cbd5e1;
+  margin-bottom: 8px;
+}
+
+.rpt-sig-lbl {
+  font-size: 11px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ============================================
+   Footer
+   ============================================ */
+.rpt-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  margin-top: 20px;
+  background: white;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  position: sticky;
+  bottom: 20px;
+  z-index: 10;
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+@media print {
+  .no-print {
+    display: none !important;
   }
   
-  .rpt-stat {
-    background: rgba(255,255,255,.88);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: var(--radius);
-    border: 1px solid rgba(255,255,255,.65);
-    box-shadow: var(--shadow-sm);
-    padding: 1.2rem 1rem;
-    display: flex; flex-direction:column;
-    align-items:center; gap:.32rem; text-align:center;
-    transition: transform .22s ease, box-shadow .22s ease;
-  }
-  .rpt-stat:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow);
-  }
-  .rpt-stat--top {
-    background: linear-gradient(135deg, var(--navy), var(--navy-mid));
-    color: #fff; border-color:transparent;
-  }
-  .rpt-stat--top .rpt-stat-lbl { color:rgba(255,255,255,.65); }
-  .rpt-stat--top .rpt-stat-num { color:#fff; }
-  
-  .rpt-stat-icon { font-size:1.8rem; line-height:1; }
-  .rpt-stat-num  {
-    font-family:'Rajdhani',sans-serif;
-    font-size:1.8rem; font-weight:700; color:var(--navy); line-height:1;
-  }
-  .rpt-stat-lbl  {
-    font-size:.75rem; font-weight:800; color:var(--steel);
-    text-transform:uppercase; letter-spacing:.6px;
-  }
-  
-  /* ── Table card ── */
-  .rpt-tbl-card {
+  .rpt-page {
     padding: 0;
-    overflow: hidden;
-    margin-bottom: 1.5rem;
-    animation: slideUp .45s ease;
+    background: white;
   }
   
-  .rpt-rank { font-size:1.1rem; }
-  
-  /* Progress bar */
-  .rpt-bar {
-    position:relative; height:20px;
-    background:var(--pale); border-radius:10px;
-    overflow:hidden; min-width:80px;
-  }
-  .rpt-bar-fill {
-    position:absolute; left:0; top:0; height:100%;
-    background:linear-gradient(90deg, var(--blue-mid), var(--steel));
-    border-radius:10px;
-    transition:width .5s ease;
-  }
-  .rpt-bar-pct {
-    position:absolute; right:.5rem; top:50%;
-    transform:translateY(-50%);
-    font-size:.74rem; font-weight:800; color:var(--navy); z-index:1;
+  .rpt-print-hdr {
+    display: block;
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    border-bottom: 2px solid #e2e8f0;
   }
   
-  /* ── Chart card ── */
-  .rpt-chart-card {
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    animation: slideUp .5s ease;
+  .rpt-section {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #e2e8f0;
   }
   
-  /* ── Footer ── */
+  .rpt-kpis {
+    break-inside: avoid;
+  }
+  
+  .rpt-charts {
+    break-inside: avoid;
+  }
+  
+  .rpt-table {
+    break-inside: avoid;
+  }
+  
+  .rpt-sig {
+    break-inside: avoid;
+  }
+  
+  .rpt-kpi {
+    box-shadow: none;
+    border: 1px solid #e2e8f0;
+  }
+  
+  .rpt-btn {
+    display: none;
+  }
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+@media (max-width: 768px) {
+  .rpt-page {
+    padding: 12px;
+  }
+  
+  .rpt-h1 {
+    font-size: 22px;
+  }
+  
+  .rpt-kpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .rpt-kpi-val {
+    font-size: 24px;
+  }
+  
+  .rpt-filters {
+    flex-direction: column;
+  }
+  
+  .rpt-fg {
+    justify-content: space-between;
+  }
+  
+  .rpt-section {
+    padding: 16px;
+  }
+  
+  .rpt-sb-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .rpt-table th,
+  .rpt-table td {
+    padding: 8px;
+  }
+  
   .rpt-footer {
-    display:flex; justify-content:flex-end;
-    gap:1rem; flex-wrap:wrap;
+    flex-direction: column;
+    gap: 12px;
+    position: static;
   }
   
-  /* ── Print ── */
-  @media print {
-    .navbar, .rpt-footer, button { display:none !important; }
-    .page-wrapper { padding:0; max-width:100%; }
-    .card  { box-shadow:none; border:1px solid #ccc; }
-    body   { background:#fff; }
+  .rpt-hdr-btns {
+    flex-wrap: wrap;
   }
   
-  /* ── Responsive ── */
-  @media (max-width:600px) {
-    .rpt-stats  { grid-template-columns:repeat(2,1fr); }
-    .rpt-footer { justify-content:center; }
+  .rpt-btn {
+    padding: 8px 16px;
+    font-size: 12px;
   }
+}
+
+@media (max-width: 480px) {
+  .rpt-kpis {
+    grid-template-columns: 1fr;
+  }
+  
+  .rpt-kpi-val--sm {
+    font-size: 14px;
+  }
+}
+
+/* ============================================
+   Scrollbar
+   ============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}/* Print Styles - Clean PDF Output */
+@media print {
+  .no-print, .screen-controls, .rpt-alert, .rpt-loading {
+    display: none !important;
+  }
+  
+  .print-content {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  body {
+    background: white;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .print-header {
+    margin-bottom: 20px !important;
+  }
+  
+  table {
+    page-break-inside: avoid;
+  }
+  
+  .rpt-charts > div {
+    page-break-inside: avoid;
+  }
+  
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+}

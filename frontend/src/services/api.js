@@ -10,7 +10,6 @@ const api = axios.create({
 // Response interceptor to unwrap data from backend
 api.interceptors.response.use(
   (response) => {
-    // If response has success flag and data property, return the data array directly
     if (response.data && response.data.success === true && response.data.data) {
       return { ...response, data: response.data.data };
     }
@@ -104,8 +103,54 @@ export const deleteOrder = async (orderId) => {
 };
 
 // Delivery Order APIs
-export const getAllDeliveryOrders = () => api.get('/delivery-orders');
-export const createDeliveryOrder = (order) => api.post('/delivery-orders', order);
-export const deleteDeliveryOrder = (orderId) => api.delete(`/delivery-orders/${orderId}`);
+export const getAllDeliveryOrders = async () => {
+  try {
+    const response = await api.get('/delivery-orders');
+    return response;
+  } catch (error) {
+    console.error('Error in getAllDeliveryOrders:', error);
+    throw error;
+  }
+};
+
+export const createDeliveryOrder = async (order) => {
+  try {
+    const response = await api.post('/delivery-orders', order);
+    return response;
+  } catch (error) {
+    console.error('Error in createDeliveryOrder:', error);
+    throw error;
+  }
+};
+
+export const updateDeliveryOrder = async (orderId, orderData) => {
+  try {
+    const response = await api.put(`/delivery-orders/${orderId}`, orderData);
+    return response;
+  } catch (error) {
+    console.error('Error in updateDeliveryOrder:', error);
+    throw error;
+  }
+};
+
+export const updateDeliveryOrderStatus = async (orderId, status) => {
+  try {
+    const response = await api.patch(`/delivery-orders/${orderId}/status`, { status });
+    return response;
+  } catch (error) {
+    console.error('Error in updateDeliveryOrderStatus:', error);
+    throw error;
+  }
+};
+
+export const deleteDeliveryOrder = async (orderId) => {
+  try {
+    const response = await api.delete(`/delivery-orders/${orderId}`);
+    return response;
+  } catch (error) {
+    console.error('Error in deleteDeliveryOrder:', error);
+    throw error;
+  }
+};
 
 export default api;
