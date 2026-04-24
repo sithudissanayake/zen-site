@@ -10,6 +10,7 @@ import OrderList from './pages/OrderList';
 import OrderDetails from './pages/OrderDetails';
 import AdminOrderList from './pages/AdminOrderList';
 import AdminOrderDetails from './pages/AdminOrderDetails';
+import UserProfilePage from './pages/UserProfilePage';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -146,6 +147,11 @@ function App() {
               onShowRegister={() => setShowRegister(true)}
             />
           } 
+        />
+
+        <Route 
+          path="/profile" 
+          element={<UserProfilePage />} 
         />
         
         {/* User Orders Routes - Protected (User must be logged in) */}

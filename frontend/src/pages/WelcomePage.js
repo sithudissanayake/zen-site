@@ -30,6 +30,10 @@ const WelcomePage = ({ isAuthenticated, user, onLogout, onShowLogin, onShowRegis
   const handleExploreProducts = () => {
     navigate('/products');
   };
+  
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
 
   const features = [
     {
@@ -85,6 +89,17 @@ const WelcomePage = ({ isAuthenticated, user, onLogout, onShowLogin, onShowRegis
             </button>
           </div>
           <div className="nav-buttons">
+            <button
+              type="button"
+              className="profile-icon-button"
+              onClick={handleProfileClick}
+              aria-label="User profile"
+              title="User Profile"
+            >
+              <span className="profile-icon">
+                {user?.fullName ? user.fullName.charAt(0).toUpperCase() : '👤'}
+              </span>
+            </button>
             {isAuthenticated ? (
               <>
                 <span className="user-greeting">Welcome, {user?.fullName?.split(' ')[0]}</span>
