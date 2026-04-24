@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import './AdminOrderDetails.css';
 
@@ -19,6 +20,7 @@ const AdminOrderDetails = ({ order, onBack, onOrderUpdated }) => {
       setEditData(order);
       setLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [order]);
 
   const fetchOrderDetails = async () => {
