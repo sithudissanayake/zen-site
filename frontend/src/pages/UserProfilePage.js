@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { updateUserProfile, deleteUser } from '../services/api';
 import './UserProfilePage.css';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import Chart from 'chart.js/auto';
 
 const UserProfilePage = () => {
