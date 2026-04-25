@@ -153,4 +153,50 @@ export const deleteDeliveryOrder = async (orderId) => {
   }
 };
 
+// Auth APIs
+export const getCurrentUser = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await api.get('/auth/me', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('Error in getCurrentUser:', error);
+    throw error;
+  }
+};
+
+export const updateUserProfile = async (updates) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await api.put('/auth/me', updates, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('Error in updateUserProfile:', error);
+    throw error;
+  }
+};
+
+export const deleteUser = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await api.delete('/auth/me', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('Error in deleteUser:', error);
+    throw error;
+  }
+};
+
 export default api;

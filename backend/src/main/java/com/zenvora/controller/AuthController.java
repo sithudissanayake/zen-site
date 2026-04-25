@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -29,26 +30,46 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
+            if (request == null) {
+                return ResponseEntity.badRequest().body(new AuthResponse(false, "Invalid registration payload"));
+            }
+
+            String fullName = trimToNull(request.getFullName());
+            String phoneNumber = trimToNull(request.getPhoneNumber());
+            String email = trimToNull(request.getEmail());
+            String password = request.getPassword();
+            String confirmPassword = request.getConfirmPassword();
+
+            if (fullName == null || phoneNumber == null || email == null || password == null || confirmPassword == null) {
+                return ResponseEntity.badRequest().body(new AuthResponse(false, "All fields are required"));
+            }
+
+            if (password.length() < 6) {
+                return ResponseEntity.badRequest().body(new AuthResponse(false, "Password must be at least 6 characters"));
+            }
+
+            email = email.toLowerCase();
+
             // Validate passwords match
-            if (!request.getPassword().equals(request.getConfirmPassword())) {
+            if (!Objects.equals(password, confirmPassword)) {
                 return ResponseEntity.badRequest().body(new AuthResponse(false, "Passwords do not match"));
             }
             
             // Check if user exists
-            if (userRepository.existsByEmail(request.getEmail().toLowerCase())) {
+            if (userRepository.existsByEmail(email)) {
                 return ResponseEntity.badRequest().body(new AuthResponse(false, "Email already exists"));
             }
             
-            if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+            if (userRepository.existsByPhoneNumber(phoneNumber)) {
                 return ResponseEntity.badRequest().body(new AuthResponse(false, "Phone number already exists"));
             }
             
             // Create user
             User user = new User();
-            user.setFullName(request.getFullName());
-            user.setEmail(request.getEmail().toLowerCase());
-            user.setPhoneNumber(request.getPhoneNumber());
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setFullName(fullName);
+            user.setEmail(email);
+            user.setPhoneNumber(phoneNumber);
+            user.setPassword(passwordEncoder.encode(password));
             user.setRole("user");
             
             User savedUser = userRepository.save(user);
@@ -63,6 +84,7 @@ public class AuthController {
             userMap.put("email", savedUser.getEmail());
             userMap.put("phoneNumber", savedUser.getPhoneNumber());
             userMap.put("role", savedUser.getRole());
+            userMap.put("rating", savedUser.getRating());
             
             AuthResponse response = new AuthResponse(true, "Account created successfully");
             response.setToken(token);
@@ -110,6 +132,7 @@ public class AuthController {
             userMap.put("email", user.getEmail());
             userMap.put("phoneNumber", user.getPhoneNumber());
             userMap.put("role", user.getRole());
+            userMap.put("rating", user.getRating());
             
             AuthResponse response = new AuthResponse(true, "Login successful");
             response.setToken(token);
@@ -155,5 +178,121 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new AuthResponse(false, "Not authorized"));
         }
+    }
+    
+    @PutMapping("/me")
+    public ResponseEntity<?> updateMe(@RequestHeader("Authorization") String authHeader, @RequestBody Map<String, String> updates) {
+        try {
+            String token = authHeader.substring(7); // Remove "Bearer "
+            String currentEmail = jwtUtil.extractEmail(token);
+            
+            User user = userRepository.findByEmail(currentEmail).orElse(null);
+            
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new AuthResponse(false, "User not found"));
+            }
+            
+            String fullName = trimToNull(updates.get("fullName"));
+            String email = trimToNull(updates.get("email"));
+            String phoneNumber = trimToNull(updates.get("phoneNumber"));
+            
+            if (fullName != null) {
+                user.setFullName(fullName);
+            }
+            
+            if (email != null) {
+                email = email.toLowerCase();
+                if (!email.equals(user.getEmail()) && userRepository.existsByEmail(email)) {
+                    return ResponseEntity.badRequest().body(new AuthResponse(false, "Email already exists"));
+                }
+                user.setEmail(email);
+            }
+            
+            if (phoneNumber != null) {
+                if (!phoneNumber.equals(user.getPhoneNumber()) && userRepository.existsByPhoneNumber(phoneNumber)) {
+                    return ResponseEntity.badRequest().body(new AuthResponse(false, "Phone number already exists"));
+                }
+                user.setPhoneNumber(phoneNumber);
+            }
+            
+            // Handle rating update
+            String ratingStr = updates.get("rating");
+            if (ratingStr != null) {
+                try {
+                    Integer rating = Integer.parseInt(ratingStr);
+                    if (rating >= 1 && rating <= 5) {
+                        user.setRating(rating);
+                    } else {
+                        return ResponseEntity.badRequest().body(new AuthResponse(false, "Rating must be between 1 and 5"));
+                    }
+                } catch (NumberFormatException e) {
+                    return ResponseEntity.badRequest().body(new AuthResponse(false, "Invalid rating value"));
+                }
+            }
+            
+            User savedUser = userRepository.save(user);
+            
+            // Generate new token if email changed
+            String newToken = token;
+            if (email != null && !email.equals(currentEmail)) {
+                newToken = jwtUtil.generateToken(savedUser.getEmail(), savedUser.getRole(), savedUser.getId());
+            }
+            
+            Map<String, Object> userMap = new HashMap<>();
+            userMap.put("id", savedUser.getId());
+            userMap.put("fullName", savedUser.getFullName());
+            userMap.put("email", savedUser.getEmail());
+            userMap.put("phoneNumber", savedUser.getPhoneNumber());
+            userMap.put("role", savedUser.getRole());
+            userMap.put("rating", savedUser.getRating());
+            
+            AuthResponse response = new AuthResponse(true, "Profile updated successfully");
+            response.setToken(newToken);
+            response.setUser(userMap);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new AuthResponse(false, "Server error during update"));
+        }
+    }
+    
+    @DeleteMapping("/me")
+    public ResponseEntity<?> deleteMe(@RequestHeader("Authorization") String authHeader) {
+        try {
+            String token = authHeader.substring(7); // Remove "Bearer "
+            String email = jwtUtil.extractEmail(token);
+            
+            User user = userRepository.findByEmail(email).orElse(null);
+            
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new AuthResponse(false, "User not found"));
+            }
+            
+            userRepository.delete(user);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "User deleted successfully");
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new AuthResponse(false, "Server error during deletion"));
+        }
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }

@@ -75,9 +75,12 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onRegisterSuccess }) 
         }),
       });
 
-      const data = await response.json();
+      const contentType = response.headers.get('content-type') || '';
+      const data = contentType.includes('application/json')
+        ? await response.json()
+        : { success: false, message: `Request failed with status ${response.status}` };
 
-      if (data.success) {
+      if (response.ok && data.success) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
 
@@ -97,7 +100,7 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onRegisterSuccess }) 
         });
         onClose();
       } else {
-        setError(data.message || 'Registration failed. Please try again.');
+        setError(data.message || `Registration failed (HTTP ${response.status}).`);
       }
     } catch (err) {
       setError('Connection error. Please check if the server is running on port 8080');
@@ -137,17 +140,12 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onRegisterSuccess }) 
             <div className="form-group">
               <label className="form-label">Full Name</label>
               <div className="input-wrapper">
-                <span className="input-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
-                </span>
                 <input
                   type="text"
                   name="fullName"
                   className="form-input"
                   placeholder="Enter your name"
+                  autoComplete="off"
                   value={formData.fullName}
                   onChange={handleChange}
                   required
@@ -158,16 +156,13 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onRegisterSuccess }) 
             <div className="form-group">
               <label className="form-label">Phone Number</label>
               <div className="input-wrapper">
-                <span className="input-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
-                  </svg>
-                </span>
                 <input
                   type="tel"
                   name="phone"
                   className="form-input"
                   placeholder="Enter phone number"
+                  autoComplete="off"
+                  inputMode="tel"
                   value={formData.phone}
                   onChange={handleChange}
                   required
@@ -179,17 +174,13 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onRegisterSuccess }) 
           <div className="form-group">
             <label className="form-label">Email Address</label>
             <div className="input-wrapper">
-              <span className="input-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                  <path d="M22 6l-10 7L2 6" />
-                </svg>
-              </span>
               <input
                 type="email"
                 name="email"
                 className="form-input"
                 placeholder="Enter your email"
+                autoComplete="off"
+                inputMode="email"
                 value={formData.email}
                 onChange={handleChange}
                 required
@@ -201,12 +192,6 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onRegisterSuccess }) 
             <div className="form-group">
               <label className="form-label">Password</label>
               <div className="input-wrapper">
-                <span className="input-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                    <path d="M7 11V7a5 5 0 0110 0v4" />
-                  </svg>
-                </span>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name="password"
@@ -239,12 +224,6 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onRegisterSuccess }) 
             <div className="form-group">
               <label className="form-label">Confirm Password</label>
               <div className="input-wrapper">
-                <span className="input-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                    <path d="M7 11V7a5 5 0 0110 0v4" />
-                  </svg>
-                </span>
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
                   name="confirmPassword"
