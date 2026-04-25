@@ -400,16 +400,11 @@ const ProductsManagement = () => {
         const x   = padL + gap * i + gap / 2 - barW / 2;
         const y   = padT + chartH - bH;
         const col = CATEGORY_COLORS[cat] || '#378ADD';
-        // bar with gradient via linearGradient id
         bars += `<rect x="${x}" y="${y}" width="${barW}" height="${bH}" rx="5" fill="${col}" opacity="0.92"/>`;
-        // top shine
         bars += `<rect x="${x}" y="${y}" width="${barW}" height="${Math.min(bH, 14)}" rx="5" fill="rgba(255,255,255,0.22)"/>`;
-        // value label
         bars += `<text x="${x + barW / 2}" y="${y - 7}" text-anchor="middle" font-size="12" font-weight="bold" fill="${col}">${val.toLocaleString()}</text>`;
-        // category label
         bars += `<text x="${x + barW / 2}" y="${H - 5}" text-anchor="middle" font-size="11" fill="#555">${cat}</text>`;
       });
-      // grid lines
       let grid = '';
       for (let i = 0; i <= 4; i++) {
         const gy = padT + chartH - (i / 4) * chartH;
@@ -419,7 +414,6 @@ const ProductsManagement = () => {
       return `<svg width="100%" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${grid}${bars}</svg>`;
     })();
 
-    // Category header colors cycle
     const CAT_HEADER_COLORS = {
       Switches:     { bg: '#1e3c72', stripe: '#2a5298' },
       Cables:       { bg: '#065f46', stripe: '#0f6e56' },
@@ -428,7 +422,6 @@ const ProductsManagement = () => {
       Uncategorized:{ bg: '#374151', stripe: '#4b5563' },
     };
 
-    // Row stripe colors per category
     const CAT_ROW_STRIPE = {
       Switches: '#eef4fd', Cables: '#ecfdf5', Sockets: '#fff7ed', General: '#fffbeb', Uncategorized: '#f9fafb',
     };
@@ -716,7 +709,7 @@ const ProductsManagement = () => {
             topProducts.map((product, index) => (
               <div key={product.id} className="top-product-item">
                 <span className="top-rank">{index + 1}.</span>
-                <span className="top-product-name">{product.name}</span>
+                <span className="top-product-name" style={{ color: '#111111' }} >{product.name}</span>
                 <span className="top-product-sales" style={{ color: getStatusColor(product.stock) }}>
                   Stock: {product.stock}
                 </span>
@@ -757,7 +750,7 @@ const ProductsManagement = () => {
                   <img src={product.photo || 'https://via.placeholder.com/150'} alt={product.name} className="product-thumb" />
                   <div className="product-info">
                     <div className="product-id">{product.id}</div>
-                    <div className="product-name">{product.name}</div>
+                    <div className="product-name" style={{ color: '#ec3f3f' }}>{product.name}</div>
                     <div className="product-price">RS. {product.price?.toFixed(2)}</div>
                     <div className="product-stock" style={{ color: getStatusColor(product.stock) }}>
                       Stock: {product.stock}

@@ -13,7 +13,12 @@ body {
 :root {
   --navbar-h: 94px;
 }
-
+.product-name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.25rem 0;
+  color: #2d3748 !important;  /* This overrides your inline style */
+}
 /* Import Google Font */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -453,12 +458,7 @@ body {
   letter-spacing: 0.5px;
 }
 
-.product-name {
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0.25rem 0;
-  color: #2d3748;
-}
+
 
 .product-price {
   color: #48bb78;
@@ -713,7 +713,7 @@ body {
 }
 
 .top-selling-panel h3::before {
-  content: "🏆";
+ 
   font-size: 1.3rem;
   animation: pulse 2s infinite;
 }
@@ -729,7 +729,7 @@ body {
 }
 
 .top-product-item:hover {
-  background: white;
+  background: rgb(255, 255, 255);
   transform: translateX(5px);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
