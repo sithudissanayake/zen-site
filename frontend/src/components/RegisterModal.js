@@ -75,9 +75,12 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onRegisterSuccess }) 
         }),
       });
 
-      const data = await response.json();
+      const contentType = response.headers.get('content-type') || '';
+      const data = contentType.includes('application/json')
+        ? await response.json()
+        : { success: false, message: `Request failed with status ${response.status}` };
 
-      if (data.success) {
+      if (response.ok && data.success) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
 
@@ -97,7 +100,7 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToLogin, onRegisterSuccess }) 
         });
         onClose();
       } else {
-        setError(data.message || 'Registration failed. Please try again.');
+        setError(data.message || `Registration failed (HTTP ${response.status}).`);
       }
     } catch (err) {
       setError('Connection error. Please check if the server is running on port 8080');

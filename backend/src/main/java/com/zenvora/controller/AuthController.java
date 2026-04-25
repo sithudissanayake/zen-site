@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -29,26 +30,46 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
+            if (request == null) {
+                return ResponseEntity.badRequest().body(new AuthResponse(false, "Invalid registration payload"));
+            }
+
+            String fullName = trimToNull(request.getFullName());
+            String phoneNumber = trimToNull(request.getPhoneNumber());
+            String email = trimToNull(request.getEmail());
+            String password = request.getPassword();
+            String confirmPassword = request.getConfirmPassword();
+
+            if (fullName == null || phoneNumber == null || email == null || password == null || confirmPassword == null) {
+                return ResponseEntity.badRequest().body(new AuthResponse(false, "All fields are required"));
+            }
+
+            if (password.length() < 6) {
+                return ResponseEntity.badRequest().body(new AuthResponse(false, "Password must be at least 6 characters"));
+            }
+
+            email = email.toLowerCase();
+
             // Validate passwords match
-            if (!request.getPassword().equals(request.getConfirmPassword())) {
+            if (!Objects.equals(password, confirmPassword)) {
                 return ResponseEntity.badRequest().body(new AuthResponse(false, "Passwords do not match"));
             }
             
             // Check if user exists
-            if (userRepository.existsByEmail(request.getEmail().toLowerCase())) {
+            if (userRepository.existsByEmail(email)) {
                 return ResponseEntity.badRequest().body(new AuthResponse(false, "Email already exists"));
             }
             
-            if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+            if (userRepository.existsByPhoneNumber(phoneNumber)) {
                 return ResponseEntity.badRequest().body(new AuthResponse(false, "Phone number already exists"));
             }
             
             // Create user
             User user = new User();
-            user.setFullName(request.getFullName());
-            user.setEmail(request.getEmail().toLowerCase());
-            user.setPhoneNumber(request.getPhoneNumber());
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setFullName(fullName);
+            user.setEmail(email);
+            user.setPhoneNumber(phoneNumber);
+            user.setPassword(passwordEncoder.encode(password));
             user.setRole("user");
             
             User savedUser = userRepository.save(user);
@@ -155,5 +176,13 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new AuthResponse(false, "Not authorized"));
         }
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }
