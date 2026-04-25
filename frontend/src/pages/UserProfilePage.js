@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { updateUserProfile, deleteUser } from '../services/api';
 import './UserProfilePage.css';
 
 const UserProfilePage = () => {
@@ -43,32 +44,57 @@ const UserProfilePage = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleUpdate = () => {
-    const updatedUser = {
-      ...user,
-      fullName: formData.fullName.trim() || user.fullName,
-      email: formData.email.trim() || user.email,
-      phoneNumber: formData.phoneNumber.trim() || user.phoneNumber || user.phone
-    };
+  const handleUpdate = async () => {
+    try {
+      const updates = {
+        fullName: formData.fullName.trim() || user.fullName,
+        email: formData.email.trim() || user.email,
+        phoneNumber: formData.phoneNumber.trim() || user.phoneNumber || user.phone
+      };
 
-    setUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-    setIsEditing(false);
-    alert('Profile updated successfully.');
+      const response = await updateUserProfile(updates);
+
+      if (response.data.success) {
+        const updatedUser = response.data.user;
+        setUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        if (response.data.token) {
+          localStorage.setItem('token', response.data.token);
+        }
+        setIsEditing(false);
+        alert('Profile updated successfully.');
+      } else {
+        alert('Failed to update profile: ' + response.data.message);
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Error updating profile. Please try again.');
+    }
   };
 
-  const handleDeleteUser = () => {
+  const handleDeleteUser = async () => {
     const confirmed = window.confirm(
-      'Are you sure you want to delete this user from this device? This action cannot be undone.'
+      'Are you sure you want to delete your account? This action cannot be undone.'
     );
 
     if (!confirmed) return;
 
-    localStorage.removeItem('token');
-    localStorage.removeItem('isAdmin');
-    localStorage.removeItem('user');
-    alert('User deleted successfully.');
-    navigate('/');
+    try {
+      const response = await deleteUser();
+
+      if (response.data.success) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('isAdmin');
+        localStorage.removeItem('user');
+        alert('Account deleted successfully.');
+        navigate('/');
+      } else {
+        alert('Failed to delete account: ' + response.data.message);
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('Error deleting account. Please try again.');
+    }
   };
 
   const escapePdfText = (value) =>

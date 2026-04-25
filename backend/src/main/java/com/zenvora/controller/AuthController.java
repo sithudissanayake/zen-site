@@ -177,6 +177,98 @@ public class AuthController {
                     .body(new AuthResponse(false, "Not authorized"));
         }
     }
+    
+    @PutMapping("/me")
+    public ResponseEntity<?> updateMe(@RequestHeader("Authorization") String authHeader, @RequestBody Map<String, String> updates) {
+        try {
+            String token = authHeader.substring(7); // Remove "Bearer "
+            String currentEmail = jwtUtil.extractEmail(token);
+            
+            User user = userRepository.findByEmail(currentEmail).orElse(null);
+            
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new AuthResponse(false, "User not found"));
+            }
+            
+            String fullName = trimToNull(updates.get("fullName"));
+            String email = trimToNull(updates.get("email"));
+            String phoneNumber = trimToNull(updates.get("phoneNumber"));
+            
+            if (fullName != null) {
+                user.setFullName(fullName);
+            }
+            
+            if (email != null) {
+                email = email.toLowerCase();
+                if (!email.equals(user.getEmail()) && userRepository.existsByEmail(email)) {
+                    return ResponseEntity.badRequest().body(new AuthResponse(false, "Email already exists"));
+                }
+                user.setEmail(email);
+            }
+            
+            if (phoneNumber != null) {
+                if (!phoneNumber.equals(user.getPhoneNumber()) && userRepository.existsByPhoneNumber(phoneNumber)) {
+                    return ResponseEntity.badRequest().body(new AuthResponse(false, "Phone number already exists"));
+                }
+                user.setPhoneNumber(phoneNumber);
+            }
+            
+            User savedUser = userRepository.save(user);
+            
+            // Generate new token if email changed
+            String newToken = token;
+            if (email != null && !email.equals(currentEmail)) {
+                newToken = jwtUtil.generateToken(savedUser.getEmail(), savedUser.getRole(), savedUser.getId());
+            }
+            
+            Map<String, Object> userMap = new HashMap<>();
+            userMap.put("id", savedUser.getId());
+            userMap.put("fullName", savedUser.getFullName());
+            userMap.put("email", savedUser.getEmail());
+            userMap.put("phoneNumber", savedUser.getPhoneNumber());
+            userMap.put("role", savedUser.getRole());
+            
+            AuthResponse response = new AuthResponse(true, "Profile updated successfully");
+            response.setToken(newToken);
+            response.setUser(userMap);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new AuthResponse(false, "Server error during update"));
+        }
+    }
+    
+    @DeleteMapping("/me")
+    public ResponseEntity<?> deleteMe(@RequestHeader("Authorization") String authHeader) {
+        try {
+            String token = authHeader.substring(7); // Remove "Bearer "
+            String email = jwtUtil.extractEmail(token);
+            
+            User user = userRepository.findByEmail(email).orElse(null);
+            
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new AuthResponse(false, "User not found"));
+            }
+            
+            userRepository.delete(user);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "User deleted successfully");
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new AuthResponse(false, "Server error during deletion"));
+        }
+    }
 
     private String trimToNull(String value) {
         if (value == null) {
