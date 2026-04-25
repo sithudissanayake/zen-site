@@ -138,3 +138,31 @@
     width: 100%;
   }
 }
+
+/* Star Rating Styles */
+.rating-input, .rating-display {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.star {
+  font-size: 1.5rem;
+  color: #a8b5c8;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.star.filled {
+  color: #fbbf24;
+}
+
+.rating-input .star:hover {
+  color: #fbbf24;
+}
+
+.rating-text {
+  margin-left: 0.5rem;
+  color: #a8b5c8;
+  font-size: 0.9rem;
+}

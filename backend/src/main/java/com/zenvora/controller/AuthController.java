@@ -84,6 +84,7 @@ public class AuthController {
             userMap.put("email", savedUser.getEmail());
             userMap.put("phoneNumber", savedUser.getPhoneNumber());
             userMap.put("role", savedUser.getRole());
+            userMap.put("rating", savedUser.getRating());
             
             AuthResponse response = new AuthResponse(true, "Account created successfully");
             response.setToken(token);
@@ -131,6 +132,7 @@ public class AuthController {
             userMap.put("email", user.getEmail());
             userMap.put("phoneNumber", user.getPhoneNumber());
             userMap.put("role", user.getRole());
+            userMap.put("rating", user.getRating());
             
             AuthResponse response = new AuthResponse(true, "Login successful");
             response.setToken(token);
@@ -214,6 +216,21 @@ public class AuthController {
                 user.setPhoneNumber(phoneNumber);
             }
             
+            // Handle rating update
+            String ratingStr = updates.get("rating");
+            if (ratingStr != null) {
+                try {
+                    Integer rating = Integer.parseInt(ratingStr);
+                    if (rating >= 1 && rating <= 5) {
+                        user.setRating(rating);
+                    } else {
+                        return ResponseEntity.badRequest().body(new AuthResponse(false, "Rating must be between 1 and 5"));
+                    }
+                } catch (NumberFormatException e) {
+                    return ResponseEntity.badRequest().body(new AuthResponse(false, "Invalid rating value"));
+                }
+            }
+            
             User savedUser = userRepository.save(user);
             
             // Generate new token if email changed
@@ -228,6 +245,7 @@ public class AuthController {
             userMap.put("email", savedUser.getEmail());
             userMap.put("phoneNumber", savedUser.getPhoneNumber());
             userMap.put("role", savedUser.getRole());
+            userMap.put("rating", savedUser.getRating());
             
             AuthResponse response = new AuthResponse(true, "Profile updated successfully");
             response.setToken(newToken);

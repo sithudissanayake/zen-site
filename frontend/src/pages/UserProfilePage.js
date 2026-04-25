@@ -14,7 +14,8 @@ const UserProfilePage = () => {
   const [formData, setFormData] = useState({
     fullName: parsedUser?.fullName || '',
     email: parsedUser?.email || '',
-    phoneNumber: parsedUser?.phoneNumber || parsedUser?.phone || ''
+    phoneNumber: parsedUser?.phoneNumber || parsedUser?.phone || '',
+    rating: parsedUser?.rating || 0
   });
   const isLoggedIn = Boolean(token || isAdmin) && Boolean(user);
 
@@ -49,7 +50,8 @@ const UserProfilePage = () => {
       const updates = {
         fullName: formData.fullName.trim() || user.fullName,
         email: formData.email.trim() || user.email,
-        phoneNumber: formData.phoneNumber.trim() || user.phoneNumber || user.phone
+        phoneNumber: formData.phoneNumber.trim() || user.phoneNumber || user.phone,
+        rating: formData.rating || null
       };
 
       const response = await updateUserProfile(updates);
@@ -137,6 +139,7 @@ const UserProfilePage = () => {
     const reportName = user.fullName || 'User';
     const reportEmail = user.email || 'N/A';
     const reportPassword = user.password || 'Not available';
+    const reportRating = user.rating ? `${user.rating}/5` : 'Not rated yet';
     const generatedAt = new Date().toLocaleString();
 
     const stream = [
@@ -151,6 +154,8 @@ const UserProfilePage = () => {
       `(Email: ${escapePdfText(reportEmail)}) Tj`,
       '0 -22 Td',
       `(Password: ${escapePdfText(reportPassword)}) Tj`,
+      '0 -22 Td',
+      `(Rating: ${escapePdfText(reportRating)}) Tj`,
       '0 -22 Td',
       `(Generated At: ${escapePdfText(generatedAt)}) Tj`,
       'ET'
@@ -228,6 +233,36 @@ const UserProfilePage = () => {
             <div className="profile-row">
               <span className="label">Role</span>
               <span className="value role">{displayRole}</span>
+            </div>
+            <div className="profile-row">
+              <span className="label">Overall Satisfaction Rating</span>
+              {isEditing ? (
+                <div className="rating-input">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span
+                      key={star}
+                      className={`star ${star <= formData.rating ? 'filled' : ''}`}
+                      onClick={() => setFormData((prev) => ({ ...prev, rating: star }))}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <div className="rating-display">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span
+                      key={star}
+                      className={`star ${star <= (user.rating || 0) ? 'filled' : ''}`}
+                    >
+                      ★
+                    </span>
+                  ))}
+                  <span className="rating-text">
+                    {user.rating ? `${user.rating}/5` : 'Not rated yet'}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>

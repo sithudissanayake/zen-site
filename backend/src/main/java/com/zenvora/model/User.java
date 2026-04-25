@@ -11,13 +11,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "full_name", nullable = false)
+    @Column(nullable = false)
     private String fullName;
     
     @Column(unique = true, nullable = false)
     private String email;
     
-    @Column(name = "phone_number", unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String phoneNumber;
     
     @Column(nullable = false)
@@ -31,6 +31,9 @@ public class User {
     
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    
+    @Column
+    private Integer rating;
     
     @PrePersist
     protected void onCreate() {
@@ -67,4 +70,7 @@ public class User {
     
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    
+    public Integer getRating() { return rating; }
+    public void setRating(Integer rating) { this.rating = rating; }
 }
