@@ -5,9 +5,9 @@ import ManageDrivers from './components/ManageDrivers';
 import DeliveryHome from './components/DeliveryHome';
 import ToDeliver from './components/ToDeliver';
 import MonthlyReport from './components/MonthlyReport';
-import ViewAllDrivers from './components/ViewAllDrivers';  // ADD THIS IMPORT
+import ViewAllDrivers from './components/ViewAllDrivers';
 import AdminOrderList from './pages/AdminOrderList';
-import OrderDetails from './pages/OrderDetails';
+import AdminOrderDetails from './pages/AdminOrderDetails';
 import './App.css';
 
 function DeliveryModule() {
@@ -43,21 +43,13 @@ function DeliveryModule() {
   );
 }
 
-// Rest of your code remains the same...
-function OrdersManagement() {
+// ✅ Receives onNavigateToProducts from AdminDashboard and passes it all the way down
+function OrdersManagement({ onNavigateToProducts }) {
   const [activeView, setActiveView] = useState('list');
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [isNewOrder, setIsNewOrder] = useState(false);
 
   const handleViewDetails = (order) => {
     setSelectedOrder(order);
-    setIsNewOrder(false);
-    setActiveView('details');
-  };
-
-  const handleAddNewOrder = () => {
-    setSelectedOrder(null);
-    setIsNewOrder(true);
     setActiveView('details');
   };
 
@@ -68,15 +60,16 @@ function OrdersManagement() {
   return (
     <div className="orders-module">
       {activeView === 'details' ? (
-        <OrderDetails
+        <AdminOrderDetails
           order={selectedOrder}
-          isNew={isNewOrder}
           onBack={handleBackToList}
+          onOrderUpdated={handleBackToList}
+          onNavigateToProducts={onNavigateToProducts} // ✅ passed to Place New Order button
         />
       ) : (
         <AdminOrderList
           onViewDetails={handleViewDetails}
-          onAddNewOrder={handleAddNewOrder}
+          onNavigateToProducts={onNavigateToProducts} // ✅ passed to Browse Products button
         />
       )}
     </div>
@@ -111,7 +104,11 @@ function AdminDashboard({ onLogout }) {
       case 'Delivery':
         return <DeliveryModule />;
       case 'Orders':
-        return <OrdersManagement />;
+        return (
+          <OrdersManagement
+            onNavigateToProducts={() => setActiveModule('Products')} // ✅ switches dashboard to Products
+          />
+        );
       case 'Users':
         return <UsersManagement />;
       case 'Products':
@@ -136,7 +133,7 @@ function AdminDashboard({ onLogout }) {
               className={`module-item ${activeModule === 'Products' ? 'active' : ''}`}
               onClick={() => setActiveModule('Products')}
             >
-              <span className="module-icon">🛒</span>
+              
               <span className="module-name">Products</span>
             </button>
             <button
@@ -144,7 +141,7 @@ function AdminDashboard({ onLogout }) {
               className={`module-item ${activeModule === 'Suppliers' ? 'active' : ''}`}
               onClick={() => setActiveModule('Suppliers')}
             >
-              <span className="module-icon">🏷️</span>
+              
               <span className="module-name">Suppliers</span>
             </button>
             <button
@@ -152,7 +149,7 @@ function AdminDashboard({ onLogout }) {
               className={`module-item ${activeModule === 'Delivery' ? 'active' : ''}`}
               onClick={() => setActiveModule('Delivery')}
             >
-              <span className="module-icon">📦</span>
+              
               <span className="module-name">Delivery</span>
             </button>
             <button
@@ -160,16 +157,8 @@ function AdminDashboard({ onLogout }) {
               className={`module-item ${activeModule === 'Orders' ? 'active' : ''}`}
               onClick={() => setActiveModule('Orders')}
             >
-              <span className="module-icon">🧾</span>
+              
               <span className="module-name">Orders</span>
-            </button>
-            <button
-              type="button"
-              className={`module-item ${activeModule === 'Users' ? 'active' : ''}`}
-              onClick={() => setActiveModule('Users')}
-            >
-              <span className="module-icon">👥</span>
-              <span className="module-name">Users</span>
             </button>
           </div>
 

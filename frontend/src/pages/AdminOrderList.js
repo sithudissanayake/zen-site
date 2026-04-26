@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './AdminOrderList.css';
 
-const AdminOrderList = () => {
+const AdminOrderList = ({ onViewDetails }) => {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -366,7 +366,6 @@ const AdminOrderList = () => {
         <div style="font-size:9px;color:#6b7280;margin-top:5px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px">${label}</div>
       </div>`).join('');
 
-    // Get logo as base64 if possible, fall back to text
     const logoHTML = `<img src="./zen.jpg" alt="Logo" style="width:58px;height:58px;object-fit:contain;border-radius:10px;border:2px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.09)" onerror="this.style.display='none'"/>`;
 
     const html = `<!DOCTYPE html>
@@ -394,7 +393,6 @@ const AdminOrderList = () => {
 <body>
   <button class="print-btn no-print" onclick="window.print()">🖨️ Save as PDF</button>
 
-  <!-- Header -->
   <div style="background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 55%,#1a5276 100%);padding:28px 36px 22px;position:relative;overflow:hidden">
     <div style="position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.04)"></div>
     <div style="position:absolute;bottom:-60px;right:80px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,0.03)"></div>
@@ -415,22 +413,14 @@ const AdminOrderList = () => {
   </div>
 
   <div style="padding:28px 36px">
-
-    <!-- KPI Cards -->
     <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px">
       ${kpiCards}
     </div>
-
-    <!-- Charts -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:26px">
-
-      <!-- Bar Chart -->
       <div style="background:#f8fafc;border-radius:14px;padding:20px 22px;border:1px solid #e2e8f0">
         <div style="font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">Orders by Status — Bar Chart</div>
         ${barRows}
       </div>
-
-      <!-- Donut Chart -->
       <div style="background:#f8fafc;border-radius:14px;padding:20px 22px;border:1px solid #e2e8f0">
         <div style="font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">Distribution Overview — Donut Chart</div>
         <div style="display:flex;align-items:center;gap:18px">
@@ -439,8 +429,6 @@ const AdminOrderList = () => {
         </div>
       </div>
     </div>
-
-    <!-- Table -->
     <div style="border-radius:14px;overflow:hidden;border:1px solid #e2e8f0;margin-bottom:22px">
       <div style="background:linear-gradient(90deg,#0f172a,#1e3a5f);padding:12px 18px">
         <span style="color:#fff;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1.5px">Order Details</span>
@@ -458,8 +446,6 @@ const AdminOrderList = () => {
         </tbody>
       </table>
     </div>
-
-    <!-- Footer -->
     <div style="display:flex;justify-content:space-between;align-items:center;padding-top:16px;border-top:1px solid #e2e8f0">
       <div style="font-size:10px;color:#94a3b8">© ${new Date().getFullYear()} Zenvora Trading &amp; Industries · All Rights Reserved · Confidential</div>
       <div style="font-size:10px;color:#94a3b8">Total Orders: ${reportData.totalOrders} &nbsp;|&nbsp; Total Revenue: Rs. ${reportData.totalRevenue.toFixed(2)}</div>
@@ -513,13 +499,11 @@ const AdminOrderList = () => {
     const pendingOrders = filteredOrders.filter(o => o.status === 'PENDING').length;
     const deliveredOrders = filteredOrders.filter(o => o.status === 'DELIVERED').length;
     const cancelledOrders = filteredOrders.filter(o => o.status === 'CANCELLED').length;
-    
     return { totalOrders, totalRevenue, pendingOrders, deliveredOrders, cancelledOrders };
   };
 
   const stats = getOrderStats();
 
-  // ── Donut chart helper ──────────────────────────────────────────────────────
   const DonutChart = ({ statusCounts, total }) => {
     const STATUS_COLORS = {
       PENDING: '#f59e0b',
@@ -600,8 +584,6 @@ const AdminOrderList = () => {
             padding: 0,
             fontFamily: 'system-ui, -apple-system, sans-serif'
           }}>
-
-            {/* ── Branded header ── */}
             <div style={{
               background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 55%, #1a5276 100%)',
               padding: '30px 38px 22px',
@@ -609,10 +591,8 @@ const AdminOrderList = () => {
               position: 'relative',
               overflow: 'hidden',
             }}>
-              {/* decorative blobs */}
               <div style={{ position:'absolute', top:'-50px', right:'-50px', width:'200px', height:'200px', borderRadius:'50%', background:'rgba(255,255,255,0.04)' }} />
               <div style={{ position:'absolute', bottom:'-70px', right:'80px', width:'260px', height:'260px', borderRadius:'50%', background:'rgba(255,255,255,0.03)' }} />
-
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', position:'relative', zIndex:1 }}>
                 <div style={{ display:'flex', alignItems:'center', gap:'18px' }}>
                   <img
@@ -635,7 +615,6 @@ const AdminOrderList = () => {
                   style={{ background:'rgba(255,255,255,0.1)', border:'1px solid rgba(255,255,255,0.2)', color:'#fff', width:'34px', height:'34px', borderRadius:'8px', fontSize:'18px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}
                 >×</button>
               </div>
-
               <div style={{ display:'flex', flexWrap:'wrap', gap:'20px', marginTop:'18px', position:'relative', zIndex:1 }}>
                 {[
                   ['Generated', new Date(reportData.generatedAt).toLocaleString()],
@@ -649,10 +628,7 @@ const AdminOrderList = () => {
               </div>
             </div>
 
-            {/* ── Body ── */}
             <div style={{ padding: '32px 38px' }}>
-
-              {/* KPI cards */}
               <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(118px, 1fr))', gap:'12px', marginBottom:'30px' }}>
                 {[
                   { label:'Total Orders',  value: reportData.totalOrders,                        color:'#1e3a5f', bg:'#eef2ff', icon:'📦' },
@@ -671,10 +647,7 @@ const AdminOrderList = () => {
                 ))}
               </div>
 
-              {/* Charts row */}
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'20px', marginBottom:'30px' }}>
-
-                {/* Bar Chart */}
                 <div style={{ background:'#f8fafc', borderRadius:'14px', padding:'22px 24px', border:'1px solid #e2e8f0' }}>
                   <div style={{ fontSize:'11px', fontWeight:'800', color:'#64748b', textTransform:'uppercase', letterSpacing:'1.5px', marginBottom:'18px' }}>
                     Orders by Status — Bar Chart
@@ -708,7 +681,6 @@ const AdminOrderList = () => {
                   </div>
                 </div>
 
-                {/* Donut Chart */}
                 <div style={{ background:'#f8fafc', borderRadius:'14px', padding:'22px 24px', border:'1px solid #e2e8f0' }}>
                   <div style={{ fontSize:'11px', fontWeight:'800', color:'#64748b', textTransform:'uppercase', letterSpacing:'1.5px', marginBottom:'18px' }}>
                     Distribution Overview — Donut Chart
@@ -717,7 +689,6 @@ const AdminOrderList = () => {
                 </div>
               </div>
 
-              {/* Orders table */}
               <div style={{ borderRadius:'14px', overflow:'hidden', border:'1px solid #e2e8f0', marginBottom:'24px' }}>
                 <div style={{ background:'linear-gradient(90deg, #0f172a, #1e3a5f)', padding:'13px 20px' }}>
                   <span style={{ color:'#fff', fontWeight:'700', fontSize:'12px', textTransform:'uppercase', letterSpacing:'1.5px' }}>
@@ -772,7 +743,6 @@ const AdminOrderList = () => {
                 </div>
               </div>
 
-              {/* Footer */}
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', paddingTop:'20px', borderTop:'1px solid #e2e8f0' }}>
                 <div style={{ fontSize:'11px', color:'#94a3b8' }}>
                   © {new Date().getFullYear()} Zenvora Trading &amp; Industries · All Rights Reserved · Confidential
@@ -792,7 +762,6 @@ const AdminOrderList = () => {
                   </button>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
@@ -900,6 +869,7 @@ const AdminOrderList = () => {
         </div>
       )}
 
+      {/* ── HEADER ───────────────────────────────────────────────────────────── */}
       <div className="admin-order-header">
         <div>
           <h1>Order Management</h1>
@@ -915,6 +885,27 @@ const AdminOrderList = () => {
           <button className="btn-report" onClick={generateReportPreview}>
             📊 Generate Report
           </button>
+          {/* ✅ Navigates to the public products page — admin token stays in localStorage so orders are placed under admin credentials */}
+          <button
+            className="btn-browse-products"
+            onClick={() => window.location.href = '/products'}
+            style={{
+              backgroundColor: '#10b981',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '10px 18px',
+              fontWeight: '700',
+              fontSize: '14px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            🛒 Browse Products
+          </button>
+          {/* ✅ Original button — untouched */}
           <button className="btn-create" onClick={() => setShowAddModal(true)}>
             + Create New Order
           </button>
@@ -1022,8 +1013,8 @@ const AdminOrderList = () => {
                       style={{ borderColor: getStatusColor(order.status) }}
                     >
                       <option value="PENDING">Pending</option>
-                      <option value="PROCESSING">Processing</option>
-                      <option value="SHIPPED">Shipped</option>
+                      <option value="PROCESSING">confirmed</option>
+                      <option value="SHIPPED">processing</option>
                       <option value="DELIVERED">Delivered</option>
                       <option value="CANCELLED">Cancelled</option>
                     </select>
@@ -1049,81 +1040,33 @@ const AdminOrderList = () => {
         <div className="modal-overlay">
           <div className="modal-content" style={{ maxWidth: '550px', width: '90%', maxHeight: '90vh', overflowY: 'auto' }}>
             <h2 style={{ marginBottom: '20px' }}>Add New Order</h2>
-            
             <div className="form-group">
               <label>Customer Name *</label>
-              <input 
-                type="text" 
-                placeholder="Enter customer name" 
-                value={newOrder.customerName} 
-                onChange={(e) => setNewOrder({...newOrder, customerName: e.target.value})} 
-                className="modal-input"
-              />
+              <input type="text" placeholder="Enter customer name" value={newOrder.customerName} onChange={(e) => setNewOrder({...newOrder, customerName: e.target.value})} className="modal-input" />
             </div>
-            
             <div className="form-group">
               <label>Phone Number *</label>
-              <input 
-                type="text" 
-                placeholder="Enter phone number" 
-                value={newOrder.customerPhone} 
-                onChange={(e) => setNewOrder({...newOrder, customerPhone: e.target.value})} 
-                className="modal-input"
-              />
+              <input type="text" placeholder="Enter phone number" value={newOrder.customerPhone} onChange={(e) => setNewOrder({...newOrder, customerPhone: e.target.value})} className="modal-input" />
             </div>
-            
             <div className="form-group">
               <label>Shipping Address *</label>
-              <textarea 
-                placeholder="Enter shipping address" 
-                value={newOrder.shippingAddress} 
-                onChange={(e) => setNewOrder({...newOrder, shippingAddress: e.target.value})} 
-                className="modal-input"
-                rows="2"
-              />
+              <textarea placeholder="Enter shipping address" value={newOrder.shippingAddress} onChange={(e) => setNewOrder({...newOrder, shippingAddress: e.target.value})} className="modal-input" rows="2" />
             </div>
-            
             <div className="form-group">
               <label>City *</label>
-              <input 
-                type="text" 
-                placeholder="Enter city" 
-                value={newOrder.city} 
-                onChange={(e) => setNewOrder({...newOrder, city: e.target.value})} 
-                className="modal-input"
-              />
+              <input type="text" placeholder="Enter city" value={newOrder.city} onChange={(e) => setNewOrder({...newOrder, city: e.target.value})} className="modal-input" />
             </div>
-            
             <div className="form-group">
               <label>Order Notes (Optional)</label>
-              <textarea 
-                placeholder="Enter any special notes" 
-                value={newOrder.orderNotes} 
-                onChange={(e) => setNewOrder({...newOrder, orderNotes: e.target.value})} 
-                className="modal-input"
-                rows="2"
-              />
+              <textarea placeholder="Enter any special notes" value={newOrder.orderNotes} onChange={(e) => setNewOrder({...newOrder, orderNotes: e.target.value})} className="modal-input" rows="2" />
             </div>
-            
             <div className="form-group">
               <label>Total Amount *</label>
-              <input 
-                type="number" 
-                placeholder="Enter total amount" 
-                value={newOrder.totalAmount} 
-                onChange={(e) => setNewOrder({...newOrder, totalAmount: e.target.value})} 
-                className="modal-input"
-                step="0.01"
-              />
+              <input type="number" placeholder="Enter total amount" value={newOrder.totalAmount} onChange={(e) => setNewOrder({...newOrder, totalAmount: e.target.value})} className="modal-input" step="0.01" />
             </div>
-            
             <div className="form-group">
               <label>Status</label>
-              <select 
-                value={newOrder.status} 
-                onChange={(e) => setNewOrder({...newOrder, status: e.target.value})}
-                className="modal-input"
-              >
+              <select value={newOrder.status} onChange={(e) => setNewOrder({...newOrder, status: e.target.value})} className="modal-input">
                 <option value="PENDING">Pending</option>
                 <option value="PROCESSING">Processing</option>
                 <option value="SHIPPED">Shipped</option>
@@ -1131,7 +1074,6 @@ const AdminOrderList = () => {
                 <option value="CANCELLED">Cancelled</option>
               </select>
             </div>
-            
             <div className="modal-buttons">
               <button className="btn-save" onClick={addOrder}>Save Order</button>
               <button className="btn-cancel" onClick={() => setShowAddModal(false)}>Cancel</button>
@@ -1145,48 +1087,40 @@ const AdminOrderList = () => {
         <div className="modal-overlay">
           <div className="modal-content" style={{ maxWidth: '550px', width: '90%' }}>
             <h2>Edit Order #{selectedOrder.orderNumber}</h2>
-            
             <div className="form-group">
               <label>Customer Name</label>
               <input type="text" value={selectedOrder.customerName || ''} onChange={(e) => setSelectedOrder({...selectedOrder, customerName: e.target.value})} className="modal-input" />
             </div>
-            
             <div className="form-group">
               <label>Phone Number</label>
               <input type="text" value={selectedOrder.customerPhone || ''} onChange={(e) => setSelectedOrder({...selectedOrder, customerPhone: e.target.value})} className="modal-input" />
             </div>
-            
             <div className="form-group">
               <label>Shipping Address</label>
               <textarea value={selectedOrder.shippingAddress || ''} onChange={(e) => setSelectedOrder({...selectedOrder, shippingAddress: e.target.value})} className="modal-input" rows="2" />
             </div>
-            
             <div className="form-group">
               <label>City</label>
               <input type="text" value={selectedOrder.city || ''} onChange={(e) => setSelectedOrder({...selectedOrder, city: e.target.value})} className="modal-input" />
             </div>
-            
             <div className="form-group">
               <label>Order Notes</label>
               <textarea value={selectedOrder.orderNotes || ''} onChange={(e) => setSelectedOrder({...selectedOrder, orderNotes: e.target.value})} className="modal-input" rows="2" />
             </div>
-            
             <div className="form-group">
               <label>Total Amount</label>
               <input type="number" value={selectedOrder.totalAmount || 0} onChange={(e) => setSelectedOrder({...selectedOrder, totalAmount: parseFloat(e.target.value)})} className="modal-input" step="0.01" />
             </div>
-            
             <div className="form-group">
               <label>Status</label>
               <select value={selectedOrder.status || 'PENDING'} onChange={(e) => setSelectedOrder({...selectedOrder, status: e.target.value})} className="modal-input">
                 <option value="PENDING">Pending</option>
-                <option value="PROCESSING">Processing</option>
-                <option value="SHIPPED">Shipped</option>
+                <option value="PROCESSING">confirmed</option>
+                <option value="SHIPPED">processing</option>
                 <option value="DELIVERED">Delivered</option>
                 <option value="CANCELLED">Cancelled</option>
               </select>
             </div>
-            
             <div className="modal-buttons">
               <button className="btn-save" onClick={updateOrder}>Save Changes</button>
               <button className="btn-cancel" onClick={() => setShowEditModal(false)}>Cancel</button>
