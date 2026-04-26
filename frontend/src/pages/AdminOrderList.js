@@ -873,6 +873,7 @@ const AdminOrderList = ({ onViewDetails }) => {
       <div className="admin-order-header">
         <div>
           <h1>Order Management</h1>
+          
           <div className="order-stats">
             <span className="stat-badge">Total: {stats.totalOrders}</span>
             <span className="stat-badge pending">Pending: {stats.pendingOrders}</span>

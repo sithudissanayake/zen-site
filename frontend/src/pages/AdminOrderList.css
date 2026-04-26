@@ -45,14 +45,18 @@
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.2);
+  background: #64748b;
   color: white;
   transition: all 0.2s ease;
+}
+.admin-order-header h1 {
+  border-bottom: none;
+  text-decoration: none;
 }
 
 .stat-badge:hover {
   transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.3);
+  background: #475569;
 }
 
 .stat-badge.pending {
@@ -295,7 +299,7 @@
 }
 
 /* ============================================
-   SEARCH SECTION - FIXED TEXT COLOR
+   SEARCH SECTION
    ============================================ */
 
 .search-section {
@@ -323,11 +327,11 @@
   font-size: 14px;
   transition: all 0.3s ease;
   background: white;
-  color: #1f2937 !important;  /* ✅ FIXED: Ensures text is dark/black */
+  color: #1f2937 !important;
 }
 
 .search-input::placeholder {
-  color: #9ca3af !important;  /* ✅ FIXED: Placeholder text color */
+  color: #9ca3af !important;
   opacity: 1;
 }
 
@@ -407,7 +411,6 @@
   color: #10b981;
 }
 
-/* Status Select Dropdown */
 .status-select {
   padding: 6px 10px;
   border-radius: 20px;
@@ -420,7 +423,7 @@
 }
 
 /* ============================================
-   REPORT MODAL - WIDE VERSION
+   REPORT MODAL
    ============================================ */
 
 .report-modal-large {
@@ -452,7 +455,6 @@
   padding: 30px;
 }
 
-/* Report Header */
 .report-header {
   text-align: center;
   margin-bottom: 35px;
@@ -473,7 +475,6 @@
   font-size: 14px;
 }
 
-/* Summary Cards - 7 cards in one row */
 .report-summary-cards {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -532,7 +533,6 @@
   font-weight: 800;
 }
 
-/* Status Bars - Full Width */
 .report-status-bars {
   margin-bottom: 35px;
   padding: 25px;
@@ -594,7 +594,6 @@
   font-size: 14px;
 }
 
-/* Report Orders Table - Full Width */
 .report-orders-table-wrapper {
   margin-bottom: 25px;
   overflow-x: auto;
@@ -636,7 +635,6 @@
   background: #f9fafb;
 }
 
-/* Status Badge Small */
 .status-badge-small {
   display: inline-block;
   padding: 4px 12px;
@@ -646,32 +644,12 @@
   text-transform: uppercase;
 }
 
-.status-badge-small.status-pending {
-  background: #fef3c7;
-  color: #d97706;
-}
+.status-badge-small.status-pending { background: #fef3c7; color: #d97706; }
+.status-badge-small.status-processing { background: #dbeafe; color: #2563eb; }
+.status-badge-small.status-shipped { background: #ede9fe; color: #7c3aed; }
+.status-badge-small.status-delivered { background: #d1fae5; color: #059669; }
+.status-badge-small.status-cancelled { background: #fee2e2; color: #dc2626; }
 
-.status-badge-small.status-processing {
-  background: #dbeafe;
-  color: #2563eb;
-}
-
-.status-badge-small.status-shipped {
-  background: #ede9fe;
-  color: #7c3aed;
-}
-
-.status-badge-small.status-delivered {
-  background: #d1fae5;
-  color: #059669;
-}
-
-.status-badge-small.status-cancelled {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-/* Report Footer */
 .report-footer {
   text-align: center;
   padding-top: 20px;
@@ -704,14 +682,8 @@
 }
 
 @keyframes slideUp {
-  from {
-    transform: translateY(50px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 .modal-content {
@@ -770,7 +742,6 @@
   border-radius: 0 0 20px 20px;
 }
 
-/* Form Styles */
 .form-group {
   margin-bottom: 15px;
 }
@@ -854,7 +825,6 @@
   color: #10b981;
 }
 
-/* Items Table in View Modal */
 .items-table {
   width: 100%;
   border-collapse: collapse;
@@ -882,13 +852,8 @@
   padding-top: 12px;
 }
 
-.text-center {
-  text-align: center;
-}
-
-.text-right {
-  text-align: right;
-}
+.text-center { text-align: center; }
+.text-right { text-align: right; }
 
 .no-items {
   text-align: center;
@@ -939,113 +904,41 @@
 }
 
 @media (max-width: 768px) {
-  .admin-order-container {
-    padding: 15px;
-  }
-  
-  .admin-order-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .header-buttons {
-    width: 100%;
-    flex-direction: column;
-  }
-  
-  .btn-report, .btn-create {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .report-filter-section {
-    flex-direction: column;
-  }
-  
-  .filter-group {
-    width: 100%;
-  }
-  
-  .report-summary-cards {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-  
-  .report-card-value {
-    font-size: 22px;
-  }
-  
-  .status-bar-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
-  }
-  
-  .status-bar-label {
-    width: auto;
-  }
-  
-  .status-bar-percentage {
-    width: auto;
-  }
-  
-  .modal-buttons {
-    flex-direction: column;
-  }
-  
-  .btn-save, .btn-cancel, .btn-download {
-    width: 100%;
-    text-align: center;
-  }
-  
-  .modal-content {
-    width: 95%;
-  }
-  
-  .info-row {
-    flex-direction: column;
-  }
-  
-  .info-label {
-    width: auto;
-    margin-bottom: 4px;
-  }
+  .admin-order-container { padding: 15px; }
+  .admin-order-header { flex-direction: column; align-items: flex-start; }
+  .header-buttons { width: 100%; flex-direction: column; }
+  .btn-report, .btn-create { width: 100%; justify-content: center; }
+  .report-filter-section { flex-direction: column; }
+  .filter-group { width: 100%; }
+  .report-summary-cards { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .report-card-value { font-size: 22px; }
+  .status-bar-item { flex-direction: column; align-items: flex-start; gap: 5px; }
+  .status-bar-label { width: auto; }
+  .status-bar-percentage { width: auto; }
+  .modal-buttons { flex-direction: column; }
+  .btn-save, .btn-cancel, .btn-download { width: 100%; text-align: center; }
+  .modal-content { width: 95%; }
+  .info-row { flex-direction: column; }
+  .info-label { width: auto; margin-bottom: 4px; }
 }
 
 @media (max-width: 480px) {
-  .report-summary-cards {
-    grid-template-columns: 1fr;
-  }
-  
-  .order-stats {
-    gap: 8px;
-  }
-  
-  .stat-badge {
-    padding: 4px 10px;
-    font-size: 10px;
-  }
+  .report-summary-cards { grid-template-columns: 1fr; }
+  .order-stats { gap: 8px; }
+  .stat-badge { padding: 4px 10px; font-size: 10px; }
 }
 
 /* ============================================
    ADDITIONAL FIXES FOR ALL INPUTS
    ============================================ */
 
-/* Ensures all text inputs have dark text */
-input, 
-textarea, 
-select,
-[type="text"],
-[type="email"],
-[type="number"],
-[type="tel"],
-[type="search"],
-[type="password"] {
+input, textarea, select,
+[type="text"], [type="email"], [type="number"],
+[type="tel"], [type="search"], [type="password"] {
   color: #1f2937 !important;
   background: white !important;
 }
 
-/* Ensures placeholder text is visible */
 ::placeholder,
 ::-webkit-input-placeholder,
 ::-moz-placeholder,
@@ -1054,13 +947,11 @@ select,
   opacity: 1 !important;
 }
 
-/* Fix for search input specifically */
 input[type="search"] {
   color: #1f2937 !important;
   -webkit-text-fill-color: #1f2937 !important;
 }
 
-/* Fix for any inherited white text */
 .admin-order-container * {
   color: inherit;
 }
