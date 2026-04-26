@@ -198,6 +198,12 @@ function App() {
                     setShowOrderDetails(false);
                     setIsAdminOrderView(false);
                   }}
+                  onNavigateToProducts={() => {
+                    // ✅ Fixed: was calling undefined setCurrentPage()
+                    // Now simply returns to the order list; admin can use the nav to go to Products
+                    setShowOrderDetails(false);
+                    setIsAdminOrderView(false);
+                  }}
                 />
               ) : (
                 <AdminOrderList 

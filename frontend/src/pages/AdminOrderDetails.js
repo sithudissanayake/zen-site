@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import './AdminOrderDetails.css';
 
-const AdminOrderDetails = ({ order, onBack, onOrderUpdated }) => {
+const AdminOrderDetails = ({ order, onBack, onOrderUpdated, onNavigateToProducts }) => {
   const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -361,6 +361,13 @@ const AdminOrderDetails = ({ order, onBack, onOrderUpdated }) => {
               </button>
               <button className="btn-delete" onClick={handleDeleteOrder}>
                 🗑️ Delete Order
+              </button>
+              <button 
+                className="btn-products" 
+                onClick={() => onNavigateToProducts && onNavigateToProducts()}
+                style={{ backgroundColor: '#10b981', marginLeft: '10px' }}
+              >
+                🛒 Place New Order
               </button>
             </div>
           </div>
