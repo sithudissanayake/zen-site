@@ -210,10 +210,19 @@
   background: white;
   cursor: pointer;
   transition: all 0.2s;
+  /* Ensure text is always visible */
+  color: #374151;
 }
 
 .tdl-qs:hover {
   transform: scale(1.02);
+}
+
+/* Force readable text on all select option states */
+.tdl-qs option {
+  color: #374151;
+  background: white;
+  font-weight: 500;
 }
 
 /* Delete Button */
@@ -362,6 +371,8 @@
   font-size: 14px;
   transition: all 0.2s;
   background: white;
+  /* Ensure text is always dark and readable */
+  color: #374151;
 }
 
 .form-input:focus {
@@ -377,6 +388,21 @@
 
 select.form-input {
   cursor: pointer;
+  color: #374151;
+  background-color: white;
+  /* Prevent browser from overriding text color on selected option */
+  -webkit-text-fill-color: #374151;
+}
+
+select.form-input option {
+  color: #374151;
+  background-color: white;
+  -webkit-text-fill-color: #374151;
+}
+
+/* Fix for select when a value is chosen — some browsers set white text */
+select.form-input:not([value=""]) {
+  color: #374151;
 }
 
 textarea.form-input {
