@@ -714,6 +714,13 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+/* Force white color for product names on product display */
+.product-page .product-card .product-info .product-name {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: none !important;
+  opacity: 1 !important;
+}
 
 .page-info {
   color: var(--gray-400);

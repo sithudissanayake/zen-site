@@ -7,6 +7,7 @@ export default function ViewAllDrivers({ onNavigate }) {
   const [search, setSearch] = useState('');
   const [alert, setAlert] = useState({ msg: '', type: '' });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchDrivers(); }, []);
 
   const fetchDrivers = async () => {
