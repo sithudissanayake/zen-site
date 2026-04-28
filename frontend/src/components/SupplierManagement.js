@@ -323,14 +323,14 @@ const SupplierManagement = () => {
               onClick={() => setActiveTab('view')}
               disabled={loading}
             >
-              👁️ View Suppliers
+               View Suppliers
             </button>
             <button 
               className={`action-btn ${activeTab === 'manage' ? 'active' : ''}`}
               onClick={() => setActiveTab('manage')}
               disabled={loading}
             >
-              📝 Manage
+               Manage
             </button>
             <button 
               className="action-btn" 
@@ -338,14 +338,14 @@ const SupplierManagement = () => {
               disabled={loading || !selectedSupplier}
               title={!selectedSupplier ? "Please select a supplier first" : "Create Purchase Order"}
             >
-              📦 Purchase Order
+               Purchase Order
             </button>
             <button 
               className="action-btn" 
               onClick={handlePurchaseReport} 
               disabled={loading}
             >
-              📊 Purchase Report
+               Purchase Report
             </button>
            
           </div>
@@ -355,7 +355,7 @@ const SupplierManagement = () => {
           <div className="view-container">
             <div className="search-section">
               <div className="search-box">
-                <span className="search-icon">🔍</span>
+                <span className="search-icon"></span>
                 <input
                   type="text"
                   placeholder="Search for suppliers..."
@@ -453,7 +453,7 @@ const SupplierManagement = () => {
                         className="btn-create-po"
                         onClick={handlePurchaseOrder}
                       >
-                        📦 Create Purchase Order for {selectedSupplier.supplierName}
+                         Create Purchase Order for {selectedSupplier.supplierName}
                       </button>
                     </div>
                   </div>
@@ -477,7 +477,7 @@ const SupplierManagement = () => {
                     disabled={loading}
                     title="Refresh suppliers list"
                   >
-                    🔄 Refresh
+                     Refresh
                   </button>
                 </div>
                 <div className="table-container">
@@ -546,7 +546,7 @@ const SupplierManagement = () => {
                   <div className="info-message">
                     Selected: <strong>{selectedSupplier.supplierName}</strong>
                     <button className="edit-btn-small" onClick={handleEditClick} disabled={loading}>
-                      ✏️ Edit
+                       Edit
                     </button>
                   </div>
                 )}
@@ -624,25 +624,25 @@ const SupplierManagement = () => {
                   {isEditing ? (
                     <>
                       <button className="btn-save" onClick={handleUpdateSupplier} disabled={loading}>
-                        {loading ? 'Saving...' : '💾 Save Changes'}
+                        {loading ? 'Saving...' : 'Save Changes'}
                       </button>
                       <button className="btn-cancel" onClick={handleCancelEdit} disabled={loading}>
-                        ❌ Cancel
+                         Cancel
                       </button>
                     </>
                   ) : (
                     <>
                       <button className="btn-add" onClick={handleAddSupplier} disabled={loading}>
-                        {loading ? 'Adding...' : '➕ Add Supplier'}
+                        {loading ? 'Adding...' : ' Add Supplier'}
                       </button>
                       <button className="btn-update" onClick={handleUpdateSupplier} disabled={!selectedSupplier || loading}>
-                        {loading ? 'Updating...' : '✏️ Update Supplier'}
+                        {loading ? 'Updating...' : 'Update Supplier'}
                       </button>
                       <button className="btn-delete" onClick={handleDeleteSupplier} disabled={!selectedSupplier || loading}>
-                        {loading ? 'Deleting...' : '🗑️ Delete Supplier'}
+                        {loading ? 'Deleting...' : ' Delete Supplier'}
                       </button>
                       <button className="btn-clear" onClick={resetForm} disabled={loading}>
-                        🔄 Clear
+                         Clear
                       </button>
                     </>
                   )}

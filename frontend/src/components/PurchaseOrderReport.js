@@ -280,7 +280,7 @@ const PurchaseOrderReport = ({ onClose }) => {
       </div>
 
       <div className="company-logo-section">
-        <div className="logo-icon">⚡</div>
+         <img src="/zen.jpg" alt="Zenvora Logo" class="logo-image" />
         <div className="company-name">ZENVORA</div>
         <div className="company-tagline">Trading & Industries (Pvt) Ltd</div>
       </div>

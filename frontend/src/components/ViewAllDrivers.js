@@ -34,7 +34,7 @@ export default function ViewAllDrivers({ onNavigate }) {
     if (!window.confirm(`Delete driver "${driver.name}"? This cannot be undone.`)) return;
     try {
       await deleteDriver(driver.id);
-      showAlert(`🗑️ ${driver.name} deleted.`, 'success');
+      showAlert(`${driver.name} deleted.`, 'success');
       fetchDrivers();
     } catch {
       showAlert('Error deleting driver. They may have linked delivery orders.', 'error');
@@ -85,12 +85,12 @@ export default function ViewAllDrivers({ onNavigate }) {
           className="form-input"
           style={{ maxWidth: '320px', flex: 1 }}
           type="text"
-          placeholder="🔍 Search by name, ID or vehicle…"
+          placeholder=" Search by name, ID or vehicle…"
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
         <button className="btn btn-primary" onClick={handleAddClick}>
-          ➕ Add Driver
+          Add Driver
         </button>
         <button className="btn btn-secondary" onClick={fetchDrivers}>
           🔄 Refresh
@@ -108,7 +108,7 @@ export default function ViewAllDrivers({ onNavigate }) {
             <p>{search ? `No drivers match "${search}"` : 'No drivers found.'}</p>
             {!search && (
               <button className="btn btn-primary" onClick={handleAddClick}>
-                ➕ Add Driver
+                Add Driver
               </button>
             )}
           </div>
@@ -161,7 +161,7 @@ export default function ViewAllDrivers({ onNavigate }) {
               Showing {filtered.length} of {drivers.length} drivers
             </span>
             <button className="btn btn-primary" onClick={handleAddClick}>
-              ➕ Add New Driver
+               Add New Driver
             </button>
           </div>
         )}

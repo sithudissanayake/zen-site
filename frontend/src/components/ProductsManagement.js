@@ -184,10 +184,10 @@ const ReportModal = ({ reportData, onClose, onDownload }) => {
           {/* Summary cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 20 }}>
             {[
-              { label: 'Total Products',      value: reportData.totalProducts,                                                                                                                                              bg: '#e8f0fe', accent: '#1e3c72', icon: '📦' },
-              { label: 'Total Stock',         value: reportData.totalStock.toLocaleString(),                                                                                                                                bg: '#e0f7ef', accent: '#0f6e56', icon: '🗂️' },
-              { label: 'Inventory Value',     value: `Rs. ${reportData.totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,                                                       bg: '#fff7e0', accent: '#b45309', icon: '💰', small: true },
-              { label: 'Healthy / Low / Out', value: `${reportData.totalProducts - reportData.lowStockCount - reportData.outOfStockCount} / ${reportData.lowStockCount} / ${reportData.outOfStockCount}`,                   bg: '#fef0f0', accent: '#991b1b', icon: '📊' },
+              { label: 'Total Products',      value: reportData.totalProducts,                                                                                                                                              bg: '#e8f0fe', accent: '#1e3c72' },
+              { label: 'Total Stock',         value: reportData.totalStock.toLocaleString(),                                                                                                                                bg: '#e0f7ef', accent: '#0f6e56' },
+              { label: 'Inventory Value',     value: `Rs. ${reportData.totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,                                                       bg: '#fff7e0', accent: '#b45309',  small: true },
+              { label: 'Healthy / Low / Out', value: `${reportData.totalProducts - reportData.lowStockCount - reportData.outOfStockCount} / ${reportData.lowStockCount} / ${reportData.outOfStockCount}`,                   bg: '#fef0f0', accent: '#991b1b'},
             ].map(({ label, value, bg, accent, icon, small }) => (
               <div key={label} style={{
                 background: bg, borderRadius: 10, padding: '14px 16px',

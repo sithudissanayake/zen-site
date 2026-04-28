@@ -352,13 +352,13 @@ const AdminOrderList = ({ onViewDetails }) => {
     }).join('');
 
     const kpiCards = [
-      { label:'Total Orders',  value: reportData.totalOrders,                         color:'#1e3a5f', bg:'#eef2ff', icon:'📦' },
-      { label:'Total Revenue', value:`Rs. ${reportData.totalRevenue.toFixed(2)}`,      color:'#065f46', bg:'#ecfdf5', icon:'💰' },
-      { label:'Pending',       value: reportData.statusCounts.PENDING,                 color:'#92400e', bg:'#fffbeb', icon:'⏳' },
-      { label:'Processing',    value: reportData.statusCounts.PROCESSING,              color:'#1e40af', bg:'#eff6ff', icon:'⚙️' },
-      { label:'Shipped',       value: reportData.statusCounts.SHIPPED,                 color:'#5b21b6', bg:'#f5f3ff', icon:'🚚' },
-      { label:'Delivered',     value: reportData.statusCounts.DELIVERED,               color:'#065f46', bg:'#d1fae5', icon:'✅' },
-      { label:'Cancelled',     value: reportData.statusCounts.CANCELLED,               color:'#991b1b', bg:'#fef2f2', icon:'❌' },
+      { label:'Total Orders',  value: reportData.totalOrders,                         color:'#1e3a5f', bg:'#eef2ff'},
+      { label:'Total Revenue', value:`Rs. ${reportData.totalRevenue.toFixed(2)}`,      color:'#065f46', bg:'#ecfdf5' },
+      { label:'Pending',       value: reportData.statusCounts.PENDING,                 color:'#92400e', bg:'#fffbeb' },
+      { label:'Processing',    value: reportData.statusCounts.PROCESSING,              color:'#1e40af', bg:'#eff6ff' },
+      { label:'Shipped',       value: reportData.statusCounts.SHIPPED,                 color:'#5b21b6', bg:'#f5f3ff'},
+      { label:'Delivered',     value: reportData.statusCounts.DELIVERED,               color:'#065f46', bg:'#d1fae5' },
+      { label:'Cancelled',     value: reportData.statusCounts.CANCELLED,               color:'#991b1b', bg:'#fef2f2' },
     ].map(({ label, value, color, bg, icon }) => `
       <div style="background:${bg};border-radius:12px;padding:14px 10px;text-align:center;flex:1;min-width:90px">
         <div style="font-size:18px;margin-bottom:5px">${icon}</div>
@@ -631,13 +631,13 @@ const AdminOrderList = ({ onViewDetails }) => {
             <div style={{ padding: '32px 38px' }}>
               <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(118px, 1fr))', gap:'12px', marginBottom:'30px' }}>
                 {[
-                  { label:'Total Orders',  value: reportData.totalOrders,                        color:'#1e3a5f', bg:'#eef2ff', icon:'📦' },
-                  { label:'Total Revenue', value:`Rs.\u00a0${reportData.totalRevenue.toFixed(2)}`, color:'#065f46', bg:'#ecfdf5', icon:'💰' },
-                  { label:'Pending',       value: reportData.statusCounts.PENDING,                color:'#92400e', bg:'#fffbeb', icon:'⏳' },
-                  { label:'Processing',    value: reportData.statusCounts.PROCESSING,             color:'#1e40af', bg:'#eff6ff', icon:'⚙️' },
-                  { label:'Shipped',       value: reportData.statusCounts.SHIPPED,                color:'#5b21b6', bg:'#f5f3ff', icon:'🚚' },
-                  { label:'Delivered',     value: reportData.statusCounts.DELIVERED,              color:'#065f46', bg:'#d1fae5', icon:'✅' },
-                  { label:'Cancelled',     value: reportData.statusCounts.CANCELLED,              color:'#991b1b', bg:'#fef2f2', icon:'❌' },
+                  { label:'Total Orders',  value: reportData.totalOrders,                        color:'#1e3a5f', bg:'#eef2ff' },
+                  { label:'Total Revenue', value:`Rs.\u00a0${reportData.totalRevenue.toFixed(2)}`, color:'#065f46', bg:'#ecfdf5' },
+                  { label:'Pending',       value: reportData.statusCounts.PENDING,                color:'#92400e', bg:'#fffbeb' },
+                  { label:'Processing',    value: reportData.statusCounts.PROCESSING,             color:'#1e40af', bg:'#eff6ff' },
+                  { label:'Shipped',       value: reportData.statusCounts.SHIPPED,                color:'#5b21b6', bg:'#f5f3ff' },
+                  { label:'Delivered',     value: reportData.statusCounts.DELIVERED,              color:'#065f46', bg:'#d1fae5' },
+                  { label:'Cancelled',     value: reportData.statusCounts.CANCELLED,              color:'#991b1b', bg:'#fef2f2' },
                 ].map(({ label, value, color, bg, icon }) => (
                   <div key={label} style={{ background: bg, borderRadius:'12px', padding:'14px 12px', textAlign:'center', border:`1px solid ${bg}` }}>
                     <div style={{ fontSize:'20px', marginBottom:'5px' }}>{icon}</div>
@@ -884,7 +884,7 @@ const AdminOrderList = ({ onViewDetails }) => {
         </div>
         <div className="header-buttons">
           <button className="btn-report" onClick={generateReportPreview}>
-            📊 Generate Report
+             Generate Report
           </button>
           {/* ✅ Navigates to the public products page — admin token stays in localStorage so orders are placed under admin credentials */}
           <button
@@ -904,7 +904,7 @@ const AdminOrderList = ({ onViewDetails }) => {
               gap: '6px'
             }}
           >
-            🛒 Browse Products
+             Browse Products
           </button>
           {/* ✅ Original button — untouched */}
           <button className="btn-create" onClick={() => setShowAddModal(true)}>
@@ -958,7 +958,7 @@ const AdminOrderList = ({ onViewDetails }) => {
       {/* Search Bar */}
       <div className="search-section">
         <div className="search-bar-container">
-          <div className="search-icon">🔍</div>
+          <div className="search-icon"></div>
           <input
             type="text"
             className="search-input"

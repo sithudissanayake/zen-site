@@ -329,19 +329,7 @@ const ProductDisplayPage = ({ isAuthenticated, user, onLogout, onShowLogin, onSh
     setShowCheckoutForm(false);
   };
 
-  const getCategoryIcon = (categoryName) => {
-    const icons = {
-      'Switches': '🔌',
-      'Cables': '🔗',
-      'Lighting': '💡',
-      'Tools': '🔧',
-      'Safety': '🛡️',
-      'Smart Home': '🏠',
-      'Sockets': '🔌',
-      'General': '📦'
-    };
-    return icons[categoryName] || '📦';
-  };
+
 
   const scrollToAbout = () => {
     navigate('/');
@@ -382,11 +370,11 @@ const ProductDisplayPage = ({ isAuthenticated, user, onLogout, onShowLogin, onSh
               setShowCart(!showCart);
               setShowCheckoutForm(false);
             }}>
-              🛒 Cart
+               Cart
               {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
             </button>
             <button className="orders-btn" onClick={() => navigate('/orders')}>
-              📋 My Orders
+               My Orders
             </button>
             {isAuthenticated ? (
               <>
@@ -436,7 +424,7 @@ const ProductDisplayPage = ({ isAuthenticated, user, onLogout, onShowLogin, onSh
               }}
               className="search-input"
             />
-            <span className="search-icon">🔍</span>
+            <span className="search-icon"></span>
           </div>
 
           <div className="category-list">
@@ -449,7 +437,7 @@ const ProductDisplayPage = ({ isAuthenticated, user, onLogout, onShowLogin, onSh
                   setActiveCategory(cat);
                 }}
               >
-                <span className="category-icon">{getCategoryIcon(cat)}</span>
+                
                 <span>{cat === 'all' ? 'All Products' : cat}</span>
               </button>
             ))}
@@ -493,7 +481,7 @@ const ProductDisplayPage = ({ isAuthenticated, user, onLogout, onShowLogin, onSh
                         />
                       ) : (
                         <div className="image-placeholder">
-                          <span style={{ fontSize: '3rem' }}>{getCategoryIcon(product.category)}</span>
+                          
                           <span style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>No Image</span>
                         </div>
                       )}

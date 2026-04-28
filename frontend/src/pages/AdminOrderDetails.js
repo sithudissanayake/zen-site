@@ -357,17 +357,17 @@ const AdminOrderDetails = ({ order, onBack, onOrderUpdated, onNavigateToProducts
 
             <div className="action-buttons">
               <button className="btn-edit" onClick={handleEditClick}>
-                ✏️ Edit Order
+                 Edit Order
               </button>
               <button className="btn-delete" onClick={handleDeleteOrder}>
-                🗑️ Delete Order
+                 Delete Order
               </button>
               <button 
                 className="btn-products" 
                 onClick={() => onNavigateToProducts && onNavigateToProducts()}
                 style={{ backgroundColor: '#10b981', marginLeft: '10px' }}
               >
-                🛒 Place New Order
+                 Place New Order
               </button>
             </div>
           </div>
@@ -477,7 +477,7 @@ const AdminOrderDetails = ({ order, onBack, onOrderUpdated, onNavigateToProducts
                 className="btn-cancel" 
                 onClick={() => setIsEditing(false)}
               >
-                ❌ Cancel
+                 Cancel
               </button>
             </div>
           </div>

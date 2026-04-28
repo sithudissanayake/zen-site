@@ -171,7 +171,7 @@ export default function ManageDrivers({ onNavigate }) {
 
       <div className="card manage-card">
         {isEditing && (
-          <div className="manage-edit-badge">✏️ Editing: {form.driverId}</div>
+          <div className="manage-edit-badge">Editing: {form.driverId}</div>
         )}
 
         <div className="manage-card-header">
@@ -211,10 +211,10 @@ export default function ManageDrivers({ onNavigate }) {
             </button>
           )}
           <button className="btn btn-danger" onClick={handleDelete} disabled={loading}>
-            🗑️ Delete
+             Delete
           </button>
           <button className="btn btn-secondary" onClick={handleClear}>
-            ✖ Clear
+            Clear
           </button>
         </div>
       </div>
@@ -229,7 +229,7 @@ export default function ManageDrivers({ onNavigate }) {
           <div className="loading-state"><div className="spinner"/><p>Loading…</p></div>
         ) : drivers.length === 0 ? (
           <div className="empty-state" style={{ padding: '3rem' }}>
-            <span className="empty-icon">🚗</span>
+            <span className="empty-icon"></span>
             <p>No drivers yet. Add your first driver above.</p>
           </div>
         ) : (
@@ -260,7 +260,7 @@ export default function ManageDrivers({ onNavigate }) {
                         className="btn btn-edit"
                         style={{ padding: '.35rem .9rem', fontSize: '.82rem' }}
                         onClick={() => handleEditRow(d)}
-                      >✏️ Edit</button>
+                      >Edit</button>
                     </td>
                   </tr>
                 ))}
@@ -271,7 +271,7 @@ export default function ManageDrivers({ onNavigate }) {
 
         <div style={{ padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between' }}>
           <button className="btn btn-secondary" onClick={() => onNavigate('ViewAllDrivers')}>
-            👁️ View All Drivers
+             View All Drivers
           </button>
           <button className="btn btn-secondary" onClick={fetchDrivers}>
             🔄 Refresh

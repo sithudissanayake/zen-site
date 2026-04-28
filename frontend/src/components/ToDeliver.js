@@ -162,7 +162,7 @@ export default function ToDeliver() {
 
   return (
     <div className="page-wrapper">
-      <h1 className="page-title">📦 Delivery Schedule</h1>
+      <h1 className="page-title"> Delivery Schedule</h1>
       {alert.msg && <div className={`alert alert-${alert.type}`}>{alert.msg}</div>}
 
       {/* ── Open Orders ── */}
@@ -203,7 +203,7 @@ export default function ToDeliver() {
 
       {/* Filter bar */}
       <div className="tdl-filter-bar">
-        <input className="tdl-search" placeholder="🔍 Search order ID, customer, driver…"
+        <input className="tdl-search" placeholder=" Search order ID, customer, driver…"
           value={search} onChange={e => setSearch(e.target.value)}/>
         <div className="tdl-filter-btns">
           {['ALL', ...STATUSES].map(s => (
@@ -236,9 +236,9 @@ export default function ToDeliver() {
 
                   <div style={{ fontWeight:700, fontSize:14, margin:'3px 0' }}>{d.customerName || 'Unknown'}</div>
                   <div style={{ fontSize:11, color:'#64748b', display:'flex', flexDirection:'column', gap:2 }}>
-                    <span>📍 {d.deliveryAddress || d.city || '—'}</span>
-                    <span>🧑‍✈️ {d.driverName || d.driverId || 'No driver'}</span>
-                    {d.deliveryDate && <span>📅 {d.deliveryDate}</span>}
+                    <span> {d.deliveryAddress || d.city || '—'}</span>
+                    <span> {d.driverName || d.driverId || 'No driver'}</span>
+                    {d.deliveryDate && <span> {d.deliveryDate}</span>}
                     {d.priority && d.priority !== 'NORMAL' && (
                       <span style={{ color:pc(d.priority), fontWeight:700 }}>⚡ {d.priority}</span>
                     )}
@@ -264,7 +264,7 @@ export default function ToDeliver() {
       {showForm && (
         <div id="tdl-form" className="card tdl-form-card">
           <h2 className="tdl-form-title">
-            {editId ? '✏️ Edit Delivery Order' : '📋 Schedule New Delivery'}
+            {editId ? 'Edit Delivery Order' : ' Schedule New Delivery'}
           </h2>
 
           <div className="tdl-form-grid">
@@ -345,15 +345,15 @@ export default function ToDeliver() {
             </div>
           </div>
 
-          <p className="tdl-note">📅 Orders are typically dispatched within one business week.</p>
+          <p className="tdl-note">Orders are typically dispatched within one business week.</p>
 
           <div className="tdl-btn-row">
             {editId
               ? <button className="btn btn-primary" onClick={handleUpdate} disabled={loading} type="button">
-                  {loading ? <><span className="btn-spinner"/>Saving…</> : '💾 Update'}
+                  {loading ? <><span className="btn-spinner"/>Saving…</> : ' Update'}
                 </button>
               : <button className="btn btn-primary" onClick={handleCreate} disabled={loading} type="button">
-                  {loading ? <><span className="btn-spinner"/>Scheduling…</> : '📤 Schedule Delivery'}
+                  {loading ? <><span className="btn-spinner"/>Scheduling…</> : ' Schedule Delivery'}
                 </button>
             }
             <button className="btn btn-secondary" onClick={clearForm} type="button">✖ Clear</button>
@@ -364,7 +364,7 @@ export default function ToDeliver() {
       {!showForm && (
         <div style={{ textAlign:'center', margin:'1.5rem 0' }}>
           <button className="btn btn-primary" onClick={() => setShowForm(true)} type="button">
-            ➕ New Delivery Order
+             New Delivery Order
           </button>
         </div>
       )}

@@ -51,16 +51,16 @@ export default function DeliveryHome({ onNavigate }) {
       <div className="dh-hero">
         <div className="dh-hero-shade"/>
         <div className="dh-hero-body">
-          <h1 className="dh-hero-title">🚚 Delivery Management</h1>
+          <h1 className="dh-hero-title"> Delivery Management</h1>
           <p className="dh-hero-sub">Fast · Safe · Always On Schedule</p>
         </div>
         <div className="dh-kpi-bar">
           {[
-            { icon:'🧑‍✈️', label:'Drivers',    val: stats.drivers   },
-            { icon:'📦',   label:'Orders',     val: stats.orders    },
-            { icon:'⏳',   label:'Pending',    val: stats.pending   },
-            { icon:'🚛',   label:'In Transit', val: stats.inTransit },
-            { icon:'✅',   label:'Delivered',  val: stats.delivered },
+            { icon:'', label:'Drivers',    val: stats.drivers   },
+            { icon:'',   label:'Orders',     val: stats.orders    },
+            { icon:'',   label:'Pending',    val: stats.pending   },
+            { icon:'',   label:'In Transit', val: stats.inTransit },
+            { icon:'',   label:'Delivered',  val: stats.delivered },
           ].map(k => (
             <div className="dh-kpi" key={k.label}>
               <span className="dh-kpi-i">{k.icon}</span>
@@ -73,13 +73,13 @@ export default function DeliveryHome({ onNavigate }) {
 
       {/* Quick actions */}
       <div className="dh-wrap">
-        <h2 className="dh-sec">⚡ Quick Actions</h2>
+        <h2 className="dh-sec"> Quick Actions</h2>
         <div className="dh-actions">
           {[
-            { icon:'📋', label:'Schedule Delivery', sub:'Assign orders to drivers',  view:'ToDeliver',     color:'#6366f1' },
-            { icon:'🚗', label:'Manage Drivers',    sub:'Add · Edit · Remove',        view:'ManageDrivers', color:'#3b82f6' },
-            { icon:'📊', label:'Monthly Report',    sub:'Charts & performance data', view:'MonthlyReport',color:'#10b981' },
-            { icon:'📄', label:'All Deliveries',    sub:'View scheduled list',        view:'ToDeliver',     color:'#f59e0b' },
+            { icon:'', label:'Schedule Delivery', sub:'Assign orders to drivers',  view:'ToDeliver',     color:'#6366f1' },
+            { icon:'', label:'Manage Drivers',    sub:'Add · Edit · Remove',        view:'ManageDrivers', color:'#3b82f6' },
+            { icon:'', label:'Monthly Report',    sub:'Charts & performance data', view:'MonthlyReport',color:'#10b981' },
+            { icon:'', label:'All Deliveries',    sub:'View scheduled list',        view:'ToDeliver',     color:'#f59e0b' },
           ].map(a => (
             <button key={a.label} className="dh-action-btn" style={{'--ac':a.color}}
               onClick={() => onNavigate?.(a.view)} type="button">
@@ -97,7 +97,7 @@ export default function DeliveryHome({ onNavigate }) {
         {/* Recent */}
         <div className="dh-panel">
           <div className="dh-panel-hd">
-            <span>📬 Recent Deliveries</span>
+            <span> Recent Deliveries</span>
             <button className="dh-panel-link" onClick={() => onNavigate?.('ToDeliver')} type="button">View all →</button>
           </div>
           {loading ? <div className="dh-spinner-wrap"><div className="dh-spin"/></div>
@@ -107,11 +107,11 @@ export default function DeliveryHome({ onNavigate }) {
                 <div>
                   <div style={{ fontWeight:800, color:'#6366f1', fontSize:12 }}>#{d.orderId}</div>
                   <div style={{ fontWeight:700, fontSize:13 }}>{d.customerName||'Unknown'}</div>
-                  <div style={{ fontSize:11, color:'#94a3b8' }}>📍 {d.deliveryAddress||d.city||'—'}</div>
+                  <div style={{ fontSize:11, color:'#94a3b8' }}> {d.deliveryAddress||d.city||'—'}</div>
                 </div>
                 <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:4 }}>
                   {chip(d.status)}
-                  <span style={{ fontSize:10, color:'#94a3b8' }}>🧑‍✈️ {d.driverId||'—'}</span>
+                  <span style={{ fontSize:10, color:'#94a3b8' }}> {d.driverId||'—'}</span>
                 </div>
               </div>
             ))}
@@ -120,7 +120,7 @@ export default function DeliveryHome({ onNavigate }) {
         {/* Leaderboard */}
         <div className="dh-panel">
           <div className="dh-panel-hd">
-            <span>🏆 Driver Leaderboard</span>
+            <span>Driver Leaderboard</span>
             <button className="dh-panel-link" onClick={() => onNavigate?.('ManageDrivers')} type="button">Manage →</button>
           </div>
           {loading ? <div className="dh-spinner-wrap"><div className="dh-spin"/></div>
@@ -140,13 +140,13 @@ export default function DeliveryHome({ onNavigate }) {
 
       {/* Pipeline */}
       <div className="dh-wrap">
-        <h2 className="dh-sec">📈 Delivery Pipeline</h2>
+        <h2 className="dh-sec">Delivery Pipeline</h2>
         <div className="dh-pipeline">
           {[
-            { icon:'🛒', label:'Orders',    val:stats.orders,    color:'#6366f1' },
-            { icon:'📅', label:'Scheduled', val:stats.scheduled, color:'#3b82f6' },
-            { icon:'🚛', label:'In Transit',val:stats.inTransit, color:'#f59e0b' },
-            { icon:'✅', label:'Delivered', val:stats.delivered, color:'#10b981' },
+            { icon:'', label:'Orders',    val:stats.orders,    color:'#6366f1' },
+            { icon:'', label:'Scheduled', val:stats.scheduled, color:'#3b82f6' },
+            { icon:'', label:'In Transit',val:stats.inTransit, color:'#f59e0b' },
+            { icon:'', label:'Delivered', val:stats.delivered, color:'#10b981' },
           ].map((s,i,arr) => (
             <React.Fragment key={s.label}>
               <div className="dh-pipe-step" style={{'--pc':s.color}}>
